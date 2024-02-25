@@ -11,7 +11,9 @@
 #define KEY_RIGHT 22
 #define KEY_LAYOUT 28
 #define KEY_ENTER 19
+#define KEY_MENU 26
 #define KEY_BS 18
+#define KEY_ESC 15
 
 struct keysym_t {
 	uint8_t code;
@@ -108,8 +110,8 @@ public:
 };
 /*
 'g', 'r', ?, 'e', f, x, z, d, s, a, up, down, q, w, esc
-extra, shift, 
-bs, enter, ??, ], <-, =>, [, p, +, menu, o, lay, i. u, y, 
+extra, shift,
+bs, enter, ??, ], <-, =>, [, p, +, menu, o, lay, i. u, y,
 j, k, ??, ;, ', ., ,, !, n, b, " ", v, h, c,
 */
 #endif
