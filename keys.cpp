@@ -120,6 +120,7 @@ Keyboard::poll(void)
 {
 	int i;
 	struct keysym_t *sym;
+	static long stamps[4] = { 0, };
 //	char msg[256];
 
 	int rows[4];
@@ -146,15 +147,23 @@ Keyboard::poll(void)
 	int shift_sym = (rows[1] == 1);
 
 	for (i = 0; i < 4; i ++) {
-		if (rows[i] == last_rows[i])
+		if (rows[i] == last_rows[i]) {
+			if (rows[i] != -1 && (millis() - stamps[i]) > 200) {
+				press[i] = rows[i]; // repeat
+				stamps[i] = millis() - 80;
+			}
 			continue;
+		}
 		if (rows[i] == -1) {
 			release[i] = last_rows[i];
+			stamps[i] = 0;
 		} else if (last_rows[i] == -1) {
 			press[i] = rows[i];
+			stamps[i] = millis();
 		} else {
 			release[i] = last_rows[i];
 			press[i] = rows[i];
+			stamps[i] = millis();
 		}
 		last_rows[i] = rows[i];
 	}
