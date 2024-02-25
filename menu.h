@@ -1,11 +1,12 @@
 #ifndef __MENU_H_INCLUDED
 #define __MENU_H_INCLUDED
+#include <Arduino.h>
 #include "keys.h"
 #include "screen.h"
 
 class Menu {
 	const char *title;
-	char **list;
+	String *list;
 	Screen &scr;
 	Keyboard &kbd;
 public:
@@ -17,7 +18,7 @@ public:
 	Menu(Screen &scr, Keyboard &kbd, const char *title, const char *items[]);
 	~Menu();
 	void append(const char *text);
-	void set(int nr, char *text);
+	void set(int nr, const char *text);
 	int process();
 	void show();
 };

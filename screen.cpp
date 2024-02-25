@@ -93,14 +93,14 @@ void
 Screen::clear(int xx, int yy, int w, int h, color_t col)
 {
 	cell_t *line = get_screen() + yy * COLS;
-	cell_t *oline = get_old_screen(); 
+	// cell_t *oline = get_old_screen();
 	for (int y = yy; y < yy + h; y ++) {
 		for (int x = xx; x < xx + w; x ++) {
 			line[x] = { .glyph = 0, .bg = col, .fg = 0 };
-			oline[x] = line[x];
+			// oline[x] = line[x];
 		}
 		line += COLS;
-		oline += COLS;
+		//oline += COLS;
 	}
 	//tft.fillRect(xx * font->w, yy * font->h, w * font->w, h * font->h, col);
 }
@@ -109,7 +109,7 @@ void
 Screen::update()
 {
 	cell_t *line = get_screen();
-	cell_t *oline = get_old_screen(); 
+	cell_t *oline = get_old_screen();
 	for (int y = 0; y < ROWS; y ++) {
 		for (int x = 0; x < COLS; x ++) {
 			if (line[x].glyph != oline[x].glyph ||

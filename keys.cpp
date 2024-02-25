@@ -120,16 +120,27 @@ Keyboard::poll(void)
 {
 	int i;
 	struct keysym_t *sym;
-	char msg[256];
+//	char msg[256];
 
 	int rows[4];
+	int rows2[4];
 
 	static int last_rows[4] = { -1, -1, -1, -1 };
 
 	uint8_t press[4] = { 255, 255, 255, 255 };
 	uint8_t release[4] = { 255, 255, 255, 255 };
 
-	poll_keys(rows);
+	boolean fuzzy;
+	do {
+		fuzzy = false;
+		poll_keys(rows);
+		poll_keys(rows2);
+		for (i = 0; i < 4; i++)
+			if (rows[i] != rows2[i]) {
+				fuzzy = true;
+				break;
+			}
+	} while (fuzzy);
 
 	int extra_sym = (rows[1] == 0);
 	int shift_sym = (rows[1] == 1);
@@ -166,11 +177,11 @@ Keyboard::poll(void)
 			else
 				s = sym->sym[layout].sym;
 			inp_add(sym->code, s);
-			if (s) {
+//			if (s) {
 //        sprintf(msg, "%s", s);
-        //tft.fillRect(0, 230, 240, 10, color(0, 0, 255));
-//        screen_text(0 + i*3, ROWS-2, msg);    
-			}
+//		tft.fillRect(0, 230, 240, 10, color(0, 0, 255));
+//        screen_text(0 + i*3, ROWS-2, msg);
+//			}
 		}
 	}
 }

@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <WiFi.h>
 #include "screen.h"
 #include "keys.h"
@@ -7,8 +8,7 @@
 Screen scr = Screen();
 Keyboard kbd = Keyboard();
 
-
-Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Irc", "Gemini", "Exit", NULL } );
+Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Irc", "Gemini", "Exit", NULL });
 Menu wifi_menu(scr, kbd, "WiFi", 32);
 Menu *menus[] = { &main_menu, &wifi_menu };
 int menu_nr = 0;
@@ -35,6 +35,7 @@ void loop()
 		wifi_menu.show();
 	} else if (m == -2 && menu_nr == 1) {
 		menu_nr = 0;
+		scr.clear();
 		main_menu.show();
 	}
 	scr.update();
