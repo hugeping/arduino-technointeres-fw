@@ -5,14 +5,17 @@
 #include "utf8.h"
 #include "menu.h"
 #include "edit.h"
+#include "sensor.h"
 
 Screen scr = Screen();
 Keyboard kbd = Keyboard();
 
-Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi list", "Text Playground", NULL });
+Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi list", "Text Playground", "Sensor", NULL });
 Menu wifi_menu(scr, kbd, "WiFi", 32);
 Edit edit_box(scr, kbd, "Edit", 4096);
-App *apps[] = { &main_menu, &wifi_menu, &edit_box };
+Sensor sensor_app(scr, kbd);
+
+App *apps[] = { &main_menu, &wifi_menu, &edit_box, &sensor_app };
 int app_nr = 0;
 
 void
@@ -20,6 +23,7 @@ setup()
 {
 	scr.setup();
 	kbd.setup();
+	sensor_app.setup();
 	main_menu.show();
 	edit_box.set("Привет, мир!");
 }
@@ -40,6 +44,9 @@ void loop()
 			wifi_menu.append(WiFi.SSID(net).c_str());
 		}
 		wifi_menu.show();
+	} else if (m == 2 && app_nr == 0) {
+		app_nr = 3;
+		//sensor_app.show();
 	} else if(m == 1 && app_nr == 0) {
 		app_nr = 2;
 		scr.clear();
