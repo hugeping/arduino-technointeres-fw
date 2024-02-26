@@ -11,11 +11,16 @@ class Edit : public App {
 	codepoint_t *buf;
 	Screen &scr;
 	Keyboard &kbd;
-	int curx;
-	int cury;
+public:
+	int x;
+	int y;
+	int w;
+	int h;
+	int off;
+	int cur;
 	int size;
 	int len;
-public:
+
 	Edit(Screen &scr, Keyboard &kbd, const char *title, int size);
 	Edit(Screen &scr, Keyboard &kbd, const char *title, const char *text);
 	~Edit();

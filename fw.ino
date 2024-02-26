@@ -4,13 +4,16 @@
 #include "keys.h"
 #include "utf8.h"
 #include "menu.h"
+#include "edit.h"
 
 Screen scr = Screen();
 Keyboard kbd = Keyboard();
 
-Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Irc", "Gemini", "Exit", NULL });
+Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Irc", "Text", "Exit", NULL });
 Menu wifi_menu(scr, kbd, "WiFi", 32);
-App *apps[] = { &main_menu, &wifi_menu };
+Edit edit_box(scr, kbd, "Edit", "Привет мир!");
+
+App *apps[] = { &main_menu, &wifi_menu, &edit_box };
 int app_nr = 0;
 
 void
@@ -33,6 +36,10 @@ void loop()
 			wifi_menu.append(WiFi.SSID(net).c_str());
 		}
 		wifi_menu.show();
+	} else if(m == 1 && app_nr == 0) {
+		app_nr = 2;
+		scr.clear();
+		edit_box.show();
 	} else if (m == -2 && app_nr == 1) {
 		app_nr = 0;
 		scr.clear();

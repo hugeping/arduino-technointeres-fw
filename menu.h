@@ -15,6 +15,11 @@ public:
 	int len;
 	int sel;
 
+	int w;
+	int h;
+	int x;
+	int y;
+
 	Menu(Screen &scr, Keyboard &kbd, const char *title, int size);
 	Menu(Screen &scr, Keyboard &kbd, const char *title, const char *items[]);
 	~Menu();

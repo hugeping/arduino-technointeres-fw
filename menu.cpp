@@ -1,12 +1,12 @@
 #include <string.h>
 #include "menu.h"
 
-Menu::Menu(Screen &screen, Keyboard &keys, const char *t, int sz) : scr(screen), kbd(keys), size(sz), len(0), sel(0), title(t)
+Menu::Menu(Screen &screen, Keyboard &keys, const char *t, int sz) : scr(screen), kbd(keys), size(sz), len(0), sel(0), title(t), x(0), y(0), w(COLS), h(ROWS)
 {
 	list = new String[size];
 }
 
-Menu::Menu(Screen &screen, Keyboard &keys, const char *t, const char *items[]) : scr(screen), kbd(keys), size(0), len(0), sel(0), title(t)
+Menu::Menu(Screen &screen, Keyboard &keys, const char *t, const char *items[]) : scr(screen), kbd(keys), size(0), len(0), sel(0), title(t), x(0), y(0), w(COLS), h(ROWS)
 {
 	for (int i=0; items[i]; i++) {
 		size ++;
@@ -35,17 +35,24 @@ void Menu::append(const char *text)
 void
 Menu::show()
 {
-	scr.clear(0, 0, COLS, 1, scr.color(0, 128, 128));
-	scr.text(0, 0, title, scr.color(255, 255, 0));
-	int nr = (sel / (W-1))*(W-1);
-	int y = 1;
-	for (int pos = nr; pos < len && y < ROWS; pos ++) {
+	int hh = h;
+	int yy = y;
+	if (title) {
+		scr.clear(x, y, w, 1, scr.color(0, 128, 128));
+		scr.text(x, y, title, scr.color(255, 255, 0));
+		hh --;
+		yy ++;
+	}
+	if (hh <=0)
+		return;
+	int nr = (sel / hh)*hh;
+	for (int pos = nr; pos < len && yy < y + h; pos ++) {
 		if (pos == sel)
-			scr.clear(0, y, COLS, 1, scr.color(0, 0, 255));
+			scr.clear(x, yy, w, 1, scr.color(0, 0, 255));
 		else
-			scr.clear(0, y, COLS, 1, 0);
-		scr.text(0, y, list[pos].c_str());
-		y ++;
+			scr.clear(x, yy, w, 1, 0);
+		scr.text(x, yy, list[pos].c_str());
+		yy ++;
 	}
 }
 

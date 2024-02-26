@@ -3,5 +3,6 @@
 class App {
 public:
 	virtual int process();
+	virtual ~App() {};
 };
 #endif
