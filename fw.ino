@@ -30,8 +30,12 @@ void loop()
 	int m = apps[app_nr]->process();
 	if (m == 0 && app_nr == 0) {
 		app_nr = 1;
+		wifi_menu.reset();
+		wifi_menu.append("Подождите...");
+		wifi_menu.show();
+		scr.update();
 		int nr = WiFi.scanNetworks();
-		wifi_menu.len = 0;
+		wifi_menu.reset();
 		for (int net = 0; net < nr; net ++) {
 			wifi_menu.append(WiFi.SSID(net).c_str());
 		}

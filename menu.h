@@ -25,6 +25,7 @@ public:
 	~Menu();
 	void append(const char *text);
 	void set(int nr, const char *text);
+	void reset();
 	int process();
 	void show();
 };

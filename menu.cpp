@@ -17,6 +17,12 @@ Menu::Menu(Screen &screen, Keyboard &keys, const char *t, const char *items[]) :
 		list[i] = String(items[i]);
 }
 
+void Menu::reset()
+{
+	len = 0;
+	sel = 0;
+}
+
 void Menu::set(int nr, const char *text)
 {
 	if (nr >= size)
