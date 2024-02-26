@@ -37,14 +37,14 @@ Edit::process()
 	int ret = -1;
 	bool dirty = false;
 	while ((c = kbd.input(&sym)) && ret == -1) {
-		if (c && sym && len < size) {
+		if (sym && len < size) {
 			memmove(&buf[cur+1], &buf[cur], sizeof(codepoint_t)*(len-cur+1));
 			utf8::to_codepoint(sym, &cp);
 			buf[cur] = cp;
 			cur ++;
 			len ++;
 			dirty = true;
-			c = 0;
+			c = -1;
 			ret = 0;
 		}
 		switch(c){
