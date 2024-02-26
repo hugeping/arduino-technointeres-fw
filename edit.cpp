@@ -107,6 +107,7 @@ Edit::show()
 	int hh = h;
 	int yy = y;
 	int xx = x;
+	scr.clear(x, y, w, h, 0);
 	if (title) {
 		scr.clear(x, y, w, 1, scr.color(0, 128, 128));
 		scr.text(x, y, title, scr.color(255, 255, 0));
