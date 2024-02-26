@@ -1,8 +1,9 @@
 #include "screen.h"
-
+//Screen *gscr = NULL;
 Screen::Screen()
 {
 	tft = TFT_eSPI();
+	//gscr = this;
 }
 
 void

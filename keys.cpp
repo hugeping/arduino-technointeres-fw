@@ -1,5 +1,5 @@
 #include "keys.h"
-
+//#include "screen.h"
 static keysym_t *keymap[] =  { row0, row1, row2, row3 };
 
 void
@@ -94,12 +94,14 @@ Keyboard::poll_keys(int out[4])
 		if (out[i] == btns[i])
 			out[i] = -1;
 	}
-  //tft.fillRect(0, 220, 240, 10, color(0, 0, 255));
-//  char msg[255];
-//  for (int i = 0; i < 4; i ++) {
-//    sprintf(msg, "%d", out[i]);
-//    screen_text(0 + i*3, ROWS-3, msg);
-//  }
+#if 0
+  	gscr->tft.fillRect(0, 220, 240, 10, gscr->color(0, 0, 255));
+	char msg[255];
+	for (int i = 0; i < 4; i ++) {
+		sprintf(msg, "%d", out[i]);
+		gscr->text(0 + i*3, ROWS-3, msg);
+	}
+#endif
 }
 
 void

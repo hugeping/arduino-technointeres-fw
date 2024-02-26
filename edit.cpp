@@ -1,9 +1,8 @@
 #include "edit.h"
 
 Edit::Edit(Screen &screen, Keyboard &keys, const char *t, int sz) : scr(screen), kbd(keys),
-	size(sz), title(t), cur(0), x(0), y(0), w(COLS), h(ROWS), off(0)
+	size(sz), title(t), cur(0), x(0), y(0), w(COLS), h(ROWS), off(0), len(0)
 {
-	len = 0;
 	buf = new codepoint_t[sz+1];
 }
 
@@ -21,10 +20,10 @@ Edit::set(const char *text)
 	const char *ptr = text;
 	codepoint_t cp;
 	int i = 0;
-	do {
+	while (*ptr && i < size) {
 		ptr = utf8::to_codepoint(ptr, &cp);
 		buf[i++] = cp;
-	} while (*ptr && i < size);
+	}
 	len = i;
 }
 
@@ -37,6 +36,9 @@ Edit::process()
 	int ret = -1;
 	bool dirty = false;
 	while ((c = kbd.input(&sym)) && ret == -1) {
+		if (c == KEY_ENTER) {
+			sym = "\n";
+		}
 		if (sym && len < size) {
 			memmove(&buf[cur+1], &buf[cur], sizeof(codepoint_t)*(len-cur+1));
 			utf8::to_codepoint(sym, &cp);
@@ -47,7 +49,23 @@ Edit::process()
 			c = -1;
 			ret = 0;
 		}
+		int skip = w;
 		switch(c){
+		case KEY_DOWN:
+			while (cur < len && skip --) {
+				if (buf[cur++] == '\n')
+					break;
+			}
+			dirty = true;
+			break;
+		case KEY_UP:
+			while (cur>0 && skip --) {
+				cur --;
+				if (buf[cur] == '\n')
+					break;
+			}
+			dirty = true;
+			break;
 		case KEY_LEFT:
 			cur --;
 			dirty = true;
@@ -112,6 +130,7 @@ Edit::show()
 	}
 	while (yy < y + h) {
 		scr.clear(xx, yy, 1, 1, 0);
+		scr.cell(xx, yy, 0, 0);
 		xx ++;
 		if (xx >= x + w) {
 			xx = x;

@@ -3,7 +3,7 @@
 
 #include <TFT_eSPI.h>
 #include <SPI.h>
-#include "font7x10.h"
+#include "font8x10.h"
 #include "utf8.h"
 
 #define W 240
@@ -11,10 +11,10 @@
 
 typedef uint16_t color_t;
 
-static const struct font8 *font = &font7x10;
+static const struct font8 *font = &font8x10;
 
-#define COLS (W/7)
-#define ROWS (H/10)
+#define COLS (W/FONT_W)
+#define ROWS (H/FONT_H)
 
 typedef struct {
 	codepoint_t glyph;
@@ -42,5 +42,7 @@ public:
 	void update();
 	color_t color(byte r, byte g, byte b);
 };
+
+//extern Screen *gscr;
 
 #endif
