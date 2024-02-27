@@ -27,6 +27,50 @@ Edit::set(const char *text)
 	len = i;
 }
 
+void
+Edit::up()
+{
+	int skip = w;
+	while (cur>0 && skip --) {
+		cur --;
+		if (buf[cur] == '\n')
+			break;
+	}
+}
+
+void
+Edit::down()
+{
+	int skip = w;
+	while (cur < len && skip --) {
+		if (buf[cur++] == '\n')
+			break;
+	}
+}
+void
+Edit::visible()
+{
+	if (cur_visible)
+		return;
+	int skip = w;
+	if (cur > off) {
+		while (off < len && skip --) {
+			if (buf[off++] == '\n')
+				break;
+		}
+	} else {
+		boolean once = false;
+		while (off > 0 && skip --) {
+			off --;
+			if (buf[off] == '\n') {
+				if (once)
+					break;
+				once = true;
+			}
+		}
+	}
+	show();
+}
 int
 Edit::process()
 {
@@ -49,21 +93,13 @@ Edit::process()
 			c = -1;
 			ret = 0;
 		}
-		int skip = w;
 		switch(c){
 		case KEY_DOWN:
-			while (cur < len && skip --) {
-				if (buf[cur++] == '\n')
-					break;
-			}
+			down();
 			dirty = true;
 			break;
 		case KEY_UP:
-			while (cur>0 && skip --) {
-				cur --;
-				if (buf[cur] == '\n')
-					break;
-			}
+			up();
 			dirty = true;
 			break;
 		case KEY_LEFT:
@@ -96,8 +132,10 @@ Edit::process()
 	cur = max(0, cur);
 	cur = min(cur, len);
 	// scr.text(0, 16, String(sel).c_str());
-	if (dirty)
+	if (dirty) {
 		show();
+		visible();
+	}
 	return ret;
 }
 
@@ -107,6 +145,7 @@ Edit::show()
 	int hh = h;
 	int yy = y;
 	int xx = x;
+	cur_visible = false;
 	scr.clear(x, y, w, h, 0);
 	if (title) {
 		scr.clear(x, y, w, 1, scr.color(0, 128, 128));
@@ -116,6 +155,8 @@ Edit::show()
 	}
 	for (int pos = off; pos <= len && yy < y + h; pos ++) {
 		codepoint_t cp = buf[pos];
+		if (cur == pos)
+			cur_visible = true;
 		scr.clear(xx, yy, 1, 1, (cur == pos)?0xffff:0);
 		if (cp == '\n') {
 			yy ++;
@@ -127,15 +168,6 @@ Edit::show()
 				xx = x;
 				yy ++;
 			}
-		}
-	}
-	while (yy < y + h) {
-		scr.clear(xx, yy, 1, 1, 0);
-		scr.cell(xx, yy, 0, 0);
-		xx ++;
-		if (xx >= x + w) {
-			xx = x;
-			yy ++;
 		}
 	}
 	scr.update();

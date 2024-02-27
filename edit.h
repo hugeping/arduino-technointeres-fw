@@ -11,6 +11,8 @@ class Edit : public App {
 	codepoint_t *buf;
 	Screen &scr;
 	Keyboard &kbd;
+	boolean cur_visible;
+	void visible();
 public:
 	int x;
 	int y;
@@ -24,6 +26,8 @@ public:
 	Edit(Screen &scr, Keyboard &kbd, const char *title, int size);
 	Edit(Screen &scr, Keyboard &kbd, const char *title, const char *text);
 	~Edit();
+	void up();
+	void down();
 	void set(const char *text);
 	int process();
 	void show();
