@@ -22,7 +22,7 @@ end
 local dict = {}
 local cur = 0
 
-print "const uint8_t FONT8x10[] PROGMEM ={"
+print "const uint8_t FONT_data[] PROGMEM ={"
 for l in io.lines() do
   if mode == 'cp' then
     if tonumber(l) then
@@ -50,7 +50,7 @@ for l in io.lines() do
 end
 print ""
 print "};"
-print "const uint16_t FONT8x10_map[] = {"
+print "const uint16_t FONT_map[] = {"
 for _, v in ipairs(dict) do
   printf("\t%d, 0x%04x, %d,\n", v.off, v.start, v.range)
 end
@@ -65,11 +65,12 @@ struct font8 {
 	const int w;
 	const int h;
 };
-
-const struct font8 font7x10 = {
-	.data = FONT8x10,
-	.map = FONT8x10_map,
-	.w = 8,
-	.h = 10,
+#define FONT_W 8
+#define FONT_H 12
+const struct font8 FONT = {
+	.data = FONT_data,
+	.map = FONT_map,
+	.w = FONT_W,
+	.h = FONT_H,
 };
 ]]

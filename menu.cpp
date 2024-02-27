@@ -43,6 +43,7 @@ Menu::show()
 {
 	int hh = h;
 	int yy = y;
+	scr.clear(x, y, w, h, 0);
 	if (title) {
 		scr.clear(x, y, w, 1, scr.color(0, 128, 128));
 		scr.text(x, y, title, scr.color(255, 255, 0));
@@ -60,6 +61,7 @@ Menu::show()
 		scr.text(x, yy, list[pos].c_str());
 		yy ++;
 	}
+	scr.update();
 }
 
 int

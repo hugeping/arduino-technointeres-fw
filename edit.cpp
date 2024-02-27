@@ -138,6 +138,7 @@ Edit::show()
 			yy ++;
 		}
 	}
+	scr.update();
 }
 
 Edit::~Edit()

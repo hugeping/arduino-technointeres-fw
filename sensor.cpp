@@ -40,4 +40,5 @@ Sensor::show()
 	scr.clear(0, 0, COLS, ROWS, 0);
 	sprintf(msg, "Температура: %dC\nВлажность: %d%%", t, h);
 	scr.text(0, 0, msg, scr.color(255, 255, 0));
+	scr.update();
 }

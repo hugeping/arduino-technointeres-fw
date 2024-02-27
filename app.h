@@ -2,7 +2,8 @@
 #define __APP_H_INCLUDED
 class App {
 public:
-	virtual int process();
+	virtual int process() {};
 	virtual ~App() {};
+	virtual void show() {};
 };
 #endif
