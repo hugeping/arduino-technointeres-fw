@@ -25,8 +25,8 @@ public:
 
 	~View();
 	void set(const char *text);
-	void up();
-	void down();
+	void up(int nr = 1);
+	void down(int nr = 1);
 	int process();
 	void show();
 };

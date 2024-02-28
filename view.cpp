@@ -18,6 +18,7 @@ View::set(const char *text)
 	if (sz > size) {
 		delete(buf);
 		buf = new codepoint_t[sz+1];
+		size = sz;
 	}
 	const char *ptr = text;
 	codepoint_t cp;
@@ -26,32 +27,37 @@ View::set(const char *text)
 		ptr = utf8::to_codepoint(ptr, &cp);
 		buf[i++] = cp;
 	}
+	buf[i] = 0;
 	len = i;
 }
 
 void
-View::down()
+View::down(int nr)
 {
 	if (visible)
 		return;
-	int skip = w;
-	while (off < len && skip --) {
-		if (buf[off++] == '\n')
-			break;
+	for (int i = 0; i<nr; i++) {
+		int skip = w;
+		while (off < len && skip --) {
+			if (buf[off++] == '\n')
+				break;
+		}
 	}
 }
 
 void
-View::up()
+View::up(int nr)
 {
 	int skip = w;
-	boolean once = false;
-	while (off > 0 && skip --) {
-		off --;
-		if (buf[off] == '\n') {
-			if (once)
-				break;
-			once = true;
+	for (int i = 0; i<nr; i++) {
+		boolean once = false;
+		while (off > 0 && skip --) {
+			off --;
+			if (buf[off] == '\n') {
+				if (once)
+					break;
+				once = true;
+			}
 		}
 	}
 }
@@ -68,12 +74,12 @@ View::process()
 		switch(c){
 		case KEY_RIGHT:
 		case KEY_DOWN:
-			down();
+			down(h/2+1);
 			dirty = true;
 			break;
 		case KEY_LEFT:
 		case KEY_UP:
-			up();
+			up(h/2+1);
 			dirty = true;
 			break;
 		case KEY_MENU:

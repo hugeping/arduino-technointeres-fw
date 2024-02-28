@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include "screen.h"
 #include "keys.h"
 #include "utf8.h"
@@ -10,8 +11,9 @@
 
 Screen scr = Screen();
 Keyboard kbd = Keyboard();
+WiFiClientSecure client;
 
-Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Edit", "Sensor", NULL });
+Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Edit", "Gemini", "Sensor", NULL });
 Menu wifi_menu(scr, kbd, "WiFi", 32);
 Edit edit_box(scr, kbd, "Edit", 4096);
 Edit wifi_pass(scr, kbd, "Password", 128);
@@ -68,8 +70,10 @@ setup()
 	//edit_box.set("Привет, мир!");
 	push_app(&main_menu);
 	wifi_pass.oneline = true;
+	wifi_pass.set("PASSWORD");
 	wifi_cancel.h = 2;
 	wifi_cancel.y = ROWS-2;
+	client.setInsecure();
 }
 void
 status()
@@ -149,6 +153,19 @@ void loop()
 			push_app(&edit_box);
 			break;
 		case 2:
+			if (client.connect("hugeping.ru", 1965)) {
+				client.println("gemini://hugeping.ru");
+				String out;
+				while (client.connected() || client.available()) {
+					String line = client.readStringUntil('\n');
+					out += line + "\n";
+				}
+				client.stop();
+				info.set(out.c_str());
+				push_app(&info);
+			}
+			break;
+		case 3:
 			push_app(&sensor_app);
 			break;
 		default:
