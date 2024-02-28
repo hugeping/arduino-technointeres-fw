@@ -70,7 +70,7 @@ setup()
 	//edit_box.set("Привет, мир!");
 	push_app(&main_menu);
 	wifi_pass.oneline = true;
-	wifi_pass.set("PASSWORD");
+	wifi_pass.set("");
 	wifi_cancel.h = 2;
 	wifi_cancel.y = ROWS-2;
 	client.setInsecure();

@@ -51,11 +51,13 @@ View::up(int nr)
 	int skip = w;
 	for (int i = 0; i<nr; i++) {
 		boolean once = false;
-		while (off > 0 && skip --) {
+		while (off > 0 && skip--) {
 			off --;
 			if (buf[off] == '\n') {
-				if (once)
+				if (once) {
+					off ++;
 					break;
+				}
 				once = true;
 			}
 		}
@@ -74,12 +76,12 @@ View::process()
 		switch(c){
 		case KEY_RIGHT:
 		case KEY_DOWN:
-			down(h/2+1);
+			down();
 			dirty = true;
 			break;
 		case KEY_LEFT:
 		case KEY_UP:
-			up(h/2+1);
+			up();
 			dirty = true;
 			break;
 		case KEY_MENU:

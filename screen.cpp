@@ -42,17 +42,21 @@ Screen::lookup_glyph(codepoint_t cp)
 }
 
 void
-Screen::draw_glyph(int x, int y, uint16_t cp, color_t col)
+Screen::draw_glyph(int x, int y, uint16_t cp, color_t col, color_t bg)
 {
 	int yy, xx;
 	const uint8_t *p = lookup_glyph(cp);
 	if (!p)
 		return;
+	tft.setWindow(x, y, x + font->w - 1, y + font->h - 1);
 	for (yy = 0; yy < font->h; yy++) {
 		uint8_t b = pgm_read_byte(p);
 		for (xx = 0; xx < font->w; xx++) {
 			if (b&1)
-				tft.fillRect(x + xx, y + yy, 1, 1, col);
+				tft.pushBlock(col, 1);
+			else
+				tft.pushBlock(bg, 1);
+				//tft.fillRect(x + xx, y + yy, 1, 1, col);
 			b >>= 1;
 		}
 		p ++;
@@ -60,7 +64,7 @@ Screen::draw_glyph(int x, int y, uint16_t cp, color_t col)
 }
 
 void
-Screen::draw_text(int x, int y, const char *str, color_t col)
+Screen::draw_text(int x, int y, const char *str, color_t col, color_t bg)
 {
 	const char *ptr = str;
 	codepoint_t cp = 0;
@@ -71,7 +75,7 @@ Screen::draw_text(int x, int y, const char *str, color_t col)
 			y = y + font->h;
 			x = ox;
 		} else {
-			draw_glyph(x, y, cp, col);
+			draw_glyph(x, y, cp, col, bg);
 			x += font->w;
 			if (x >= W-font->w) {
 				x = 0;
@@ -86,8 +90,10 @@ Screen::update_cell(int x, int y, cell_t *cell)
 {
 	x *= font->w;
 	y *= font->h;
-	tft.fillRect(x, y, font->w, font->h, cell->bg);
-	draw_glyph(x, y, cell->glyph, cell->fg);
+	if (!cell->glyph)
+		tft.fillRect(x, y, font->w, font->h, cell->bg);
+	else
+		draw_glyph(x, y, cell->glyph, cell->fg, cell->bg);
 }
 
 void

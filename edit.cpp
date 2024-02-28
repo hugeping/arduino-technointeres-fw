@@ -92,8 +92,10 @@ Edit::visible()
 		while (off > 0 && skip --) {
 			off --;
 			if (buf[off] == '\n') {
-				if (once)
+				if (once) {
+					off ++;
 					break;
+				}
 				once = true;
 			}
 		}
