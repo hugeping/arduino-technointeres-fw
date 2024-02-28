@@ -16,7 +16,7 @@ Menu wifi_menu(scr, kbd, "WiFi", 32);
 Edit edit_box(scr, kbd, "Edit", 4096);
 Edit wifi_pass(scr, kbd, "Password", 128);
 View info(scr, kbd, "Info");
-Menu wifi_cancel(scr, kbd, NULL, (const char *[]) { "Ok", "Cancel", NULL });
+Menu wifi_cancel(scr, kbd, NULL, (const char *[]) { "Ok", "Disconnect", NULL });
 
 static char fmt[256];
 
@@ -106,12 +106,13 @@ after_wifi_cancel(int m)
 void
 select_wifi(int m)
 {
+	static const char *statuses[] = { "Idle", "No SSID", "SCAN", "CONNECTED", "FAILED", "LOST", "DISCONNECTED" };
 	int status = WiFi.status();
 	if (status != WL_NO_SHIELD) {
-		sprintf(fmt, "SSID: %s\nIP: %s\nStatus: %d",
+		sprintf(fmt, "SSID: %s\nIP: %s\nStatus: %s",
 			WiFi.SSID().c_str(),
 			WiFi.localIP().toString().c_str(),
-			WiFi.status());
+			statuses[status]);
 		info.set(fmt);
 		info.show();
 		push_app(&wifi_cancel);
