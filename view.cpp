@@ -29,6 +29,7 @@ View::set(const char *text)
 	}
 	buf[i] = 0;
 	len = i;
+	off = 0;
 }
 
 void
