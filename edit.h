@@ -30,6 +30,8 @@ public:
 	void down();
 	void set(const char *text);
 	int process();
+	const char *text();
 	void show();
+	void geom(int x, int y, int w, int h);
 };
 #endif

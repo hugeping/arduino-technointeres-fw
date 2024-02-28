@@ -26,7 +26,7 @@ Sensor::process()
 	}
 	while ((c = kbd.input()) && ret == -1) {
 		if (c == KEY_ESC)
-			ret = -2;
+			ret = APP_EXIT;
 	}
 	if (ret == -1)
 		delay(100);

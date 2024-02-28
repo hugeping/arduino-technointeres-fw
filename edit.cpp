@@ -1,9 +1,12 @@
 #include "edit.h"
+static char *text_buf = NULL;
+static int text_size = -1;
 
 Edit::Edit(Screen &screen, Keyboard &keys, const char *t, int sz) : scr(screen), kbd(keys),
 	size(sz), title(t), cur(0), x(0), y(0), w(COLS), h(ROWS), off(0), len(0)
 {
 	buf = new codepoint_t[sz+1];
+	set("");
 }
 
 Edit::Edit(Screen &screen, Keyboard &keys, const char *t, const char *text) : scr(screen), kbd(keys),
@@ -12,6 +15,33 @@ Edit::Edit(Screen &screen, Keyboard &keys, const char *t, const char *text) : sc
 	size = utf8::len(text);
 	buf = new codepoint_t[size+1];
 	set(text);
+}
+void
+Edit::geom(int x, int y, int w, int h)
+{
+	this->x = x;
+	this->y = y;
+	this->w = w;
+	this->h = h;
+}
+
+const char *
+Edit::text()
+{
+	int sz = 0;
+	for (int i = 0; i < len; i ++)
+		sz += utf8::from_codepoint(buf[i]);
+	if (sz > text_size) {
+		if (text_buf)
+			free(text_buf);
+		text_buf = (char*)malloc(sz + 1);
+		text_size = sz;
+	}
+	char *ptr = text_buf;
+	for (int i = 0; i < len; i ++)
+		ptr += utf8::from_codepoint(buf[i], ptr);
+	*ptr = 0;
+	return text_buf;
 }
 
 void
@@ -24,6 +54,7 @@ Edit::set(const char *text)
 		ptr = utf8::to_codepoint(ptr, &cp);
 		buf[i++] = cp;
 	}
+	buf[i] = 0;
 	len = i;
 }
 
@@ -119,7 +150,7 @@ Edit::process()
 			}
 			break;
 		case KEY_ESC:
-			ret = -2;
+			ret = APP_EXIT;
 			break;
 		case KEY_MENU:
 		case KEY_ENTER:

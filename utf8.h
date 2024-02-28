@@ -7,6 +7,7 @@ class utf8
 {
 public:
 	static const char *to_codepoint(const char *p, codepoint_t *dst = NULL);
+	static int from_codepoint(codepoint_t cp, char *out = NULL);
 	static size_t len(const char *p);
 };
 

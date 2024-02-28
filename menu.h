@@ -23,6 +23,7 @@ public:
 	Menu(Screen &scr, Keyboard &kbd, const char *title, int size);
 	Menu(Screen &scr, Keyboard &kbd, const char *title, const char *items[]);
 	~Menu();
+	const char *selected() { return list[sel].c_str(); };
 	void append(const char *text);
 	void set(int nr, const char *text);
 	void reset();

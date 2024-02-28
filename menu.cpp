@@ -83,7 +83,7 @@ Menu::process()
 			dirty = true;
 			break;
 		case KEY_ESC:
-			ret = -2;
+			ret = APP_EXIT;
 			break;
 		case KEY_MENU:
 		case KEY_ENTER:
