@@ -109,11 +109,11 @@ Keyboard::layout_toggle()
 {
 	layout = layout ^ 1;
 	if (layout) {
-		analogWrite(RU, 128);
+		analogWrite(RU, 255);
 		analogWrite(EN, 0);
 	} else {
 		analogWrite(RU, 0);
-		analogWrite(EN, 128);
+		analogWrite(EN, 255);
 	}
 }
 
@@ -152,7 +152,7 @@ Keyboard::poll(void)
 		if (rows[i] == last_rows[i]) {
 			if (rows[i] != -1 && (millis() - stamps[i]) > 200) {
 				press[i] = rows[i]; // repeat
-				stamps[i] = millis() - 80;
+				stamps[i] = millis() - 150;
 			}
 			continue;
 		}

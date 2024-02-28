@@ -1,12 +1,12 @@
 #include <string.h>
 #include "menu.h"
 
-Menu::Menu(Screen &screen, Keyboard &keys, const char *t, int sz) : scr(screen), kbd(keys), size(sz), len(0), sel(0), title(t), x(0), y(0), w(COLS), h(ROWS)
+Menu::Menu(Screen &screen, Keyboard &keys, const char *t, int sz) : scr(screen), kbd(keys), size(sz), title(t)
 {
 	list = new String[size];
 }
 
-Menu::Menu(Screen &screen, Keyboard &keys, const char *t, const char *items[]) : scr(screen), kbd(keys), size(0), len(0), sel(0), title(t), x(0), y(0), w(COLS), h(ROWS)
+Menu::Menu(Screen &screen, Keyboard &keys, const char *t, const char *items[]) : scr(screen), kbd(keys), title(t)
 {
 	for (int i=0; items[i]; i++) {
 		size ++;

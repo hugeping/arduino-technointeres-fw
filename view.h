@@ -11,14 +11,15 @@ class View : public App {
 	codepoint_t *buf;
 	Screen &scr;
 	Keyboard &kbd;
+	boolean visible = false;
 public:
-	int x;
-	int y;
-	int w;
-	int h;
-	int off;
-	int size;
-	int len;
+	int x = 0;
+	int y = 0;
+	int w = COLS;
+	int h = ROWS;
+	int off = 0;
+	int size = 0;
+	int len = 0;
 
 	View(Screen &scr, Keyboard &kbd, const char *title);
 

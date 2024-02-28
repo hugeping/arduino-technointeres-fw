@@ -2,15 +2,13 @@
 static char *text_buf = NULL;
 static int text_size = -1;
 
-Edit::Edit(Screen &screen, Keyboard &keys, const char *t, int sz) : scr(screen), kbd(keys),
-	size(sz), title(t), cur(0), x(0), y(0), w(COLS), h(ROWS), off(0), len(0)
+Edit::Edit(Screen &screen, Keyboard &keys, const char *t, int sz) : scr(screen), kbd(keys), size(sz), title(t)
 {
 	buf = new codepoint_t[sz+1];
 	set("");
 }
 
-Edit::Edit(Screen &screen, Keyboard &keys, const char *t, const char *text) : scr(screen), kbd(keys),
-	title(t), cur(0), x(0), y(0), w(COLS), h(ROWS), off(0)
+Edit::Edit(Screen &screen, Keyboard &keys, const char *t, const char *text) : scr(screen), kbd(keys), title(t)
 {
 	size = utf8::len(text);
 	buf = new codepoint_t[size+1];
@@ -111,7 +109,7 @@ Edit::process()
 	int ret = -1;
 	bool dirty = false;
 	while ((c = kbd.input(&sym)) && ret == -1) {
-		if (c == KEY_ENTER) {
+		if (c == KEY_ENTER && !oneline) {
 			sym = "\n";
 		}
 		if (sym && len < size) {

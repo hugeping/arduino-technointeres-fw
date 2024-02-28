@@ -11,14 +11,14 @@ class Menu : public App {
 	Screen &scr;
 	Keyboard &kbd;
 public:
-	int size;
-	int len;
-	int sel;
+	int size = 0;
+	int len = 0;
+	int sel = 0;
 
-	int w;
-	int h;
-	int x;
-	int y;
+	int w = COLS;
+	int h = ROWS;
+	int x = 0;
+	int y = 0;
 
 	Menu(Screen &scr, Keyboard &kbd, const char *title, int size);
 	Menu(Screen &scr, Keyboard &kbd, const char *title, const char *items[]);

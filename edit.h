@@ -14,14 +14,15 @@ class Edit : public App {
 	boolean cur_visible;
 	void visible();
 public:
-	int x;
-	int y;
-	int w;
-	int h;
-	int off;
-	int cur;
-	int size;
-	int len;
+	boolean oneline = false;
+	int x = 0;
+	int y = 0;
+	int w = COLS;
+	int h = ROWS;
+	int off = 0;
+	int cur = 0;
+	int size = 0;
+	int len = 0;
 
 	Edit(Screen &scr, Keyboard &kbd, const char *title, int size);
 	Edit(Screen &scr, Keyboard &kbd, const char *title, const char *text);

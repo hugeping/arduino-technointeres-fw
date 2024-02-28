@@ -1,6 +1,6 @@
 #include "view.h"
 
-View::View(Screen &screen, Keyboard &keys, const char *t) : scr(screen), kbd(keys), title(t), x(0), y(0), w(COLS), h(ROWS), off(0), len(0), size(0)
+View::View(Screen &screen, Keyboard &keys, const char *t) : scr(screen), kbd(keys), title(t)
 {
 	size = 256;
 	buf = new codepoint_t[size+1];
@@ -32,6 +32,8 @@ View::set(const char *text)
 void
 View::down()
 {
+	if (visible)
+		return;
 	int skip = w;
 	while (off < len && skip --) {
 		if (buf[off++] == '\n')
@@ -115,6 +117,7 @@ View::show()
 				yy ++;
 			}
 		}
+		visible = pos == len;
 	}
 	scr.update();
 }
