@@ -37,32 +37,15 @@ View::down(int nr)
 {
 	if (visible)
 		return;
-	for (int i = 0; i<nr; i++) {
-		int skip = w;
-		while (off < len && skip --) {
-			if (buf[off++] == '\n')
-				break;
-		}
-	}
+	for (int i = 0; i<nr; i++)
+		off = utf8::fmt_down(buf, off, len, w);
 }
 
 void
 View::up(int nr)
 {
-	int skip = w;
-	for (int i = 0; i<nr; i++) {
-		boolean once = false;
-		while (off > 0 && skip--) {
-			off --;
-			if (buf[off] == '\n') {
-				if (once) {
-					off ++;
-					break;
-				}
-				once = true;
-			}
-		}
-	}
+	for (int i = 0; i < nr && off; i ++)
+		off = utf8::fmt_up(buf, off, w);
 }
 
 int
@@ -103,8 +86,8 @@ void
 View::show()
 {
 	int hh = h;
-	int yy = y;
-	int xx = x;
+	int yy = 0;
+	int xx = 0;
 	scr.clear(x, y, w, h, 0);
 	if (title) {
 		scr.clear(x, y, w, 1, scr.color(0, 128, 128));
@@ -112,21 +95,16 @@ View::show()
 		hh --;
 		yy ++;
 	}
-	for (int pos = off; pos <= len && yy < y + h; pos ++) {
+	int pos = off;
+	while (pos <= len && yy < h) {
 		codepoint_t cp = buf[pos];
-		scr.clear(xx, yy, 1, 1, 0);
-		if (cp == '\n') {
-			yy ++;
-			xx = x;
-		} else {
-			scr.cell(xx, yy, cp, 0xffff);
-			xx ++;
-			if (xx >= x + w) {
-				xx = x;
-				yy ++;
-			}
-		}
+		int ox = xx + x;
+		int oy = yy + y;
 		visible = pos == len;
+		if (utf8::fmt_next(buf, &pos, len, w, &xx, &yy)) {
+			scr.clear(ox, oy, 1, 1, 0);
+			scr.cell(ox, oy, cp, 0xffff);
+		}
 	}
 	scr.update();
 }

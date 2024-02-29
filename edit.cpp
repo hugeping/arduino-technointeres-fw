@@ -70,36 +70,18 @@ Edit::up()
 void
 Edit::down()
 {
-	int skip = w;
-	while (cur < len && skip --) {
-		if (buf[cur++] == '\n')
-			break;
-	}
+	cur = utf8::fmt_down(buf, cur, len, w);
 }
+
 void
 Edit::visible()
 {
 	if (cur_visible)
 		return;
-	int skip = w;
-	if (cur > off) {
-		while (off < len && skip --) {
-			if (buf[off++] == '\n')
-				break;
-		}
-	} else {
-		boolean once = false;
-		while (off > 0 && skip --) {
-			off --;
-			if (buf[off] == '\n') {
-				if (once) {
-					off ++;
-					break;
-				}
-				once = true;
-			}
-		}
-	}
+	if (cur < off)
+		off = utf8::fmt_up(buf, off, w);
+	else
+		off = utf8::fmt_down(buf, off, len, w);
 	show();
 }
 int

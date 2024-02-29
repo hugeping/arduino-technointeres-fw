@@ -1,5 +1,66 @@
 #include "utf8.h"
+int
+utf8::start_line(codepoint_t *buf, int off)
+{
+	while (off--) {
+		if (buf[off] == '\n')
+			return off+1;
+	}
+	return off + 1;
+}
 
+int
+utf8::prev_line(codepoint_t *buf, int off)
+{
+	off = start_line(buf, off);
+	if (!off)
+		return off;
+	return start_line(buf, off - 1);
+}
+
+int
+utf8::fmt_up(codepoint_t *buf, int off, int w)
+{
+	int noff = prev_line(buf, off);
+	int xx = 0;
+	int yy = 0;
+	int lastoff = noff;
+	while (noff < off) {
+		int oy = yy;
+		utf8::fmt_next(buf, &noff, off, w, &xx, &yy);
+		if (yy != oy) {
+			if (noff < off)
+				lastoff = noff;
+		}
+	}
+	return lastoff;
+}
+int
+utf8::fmt_down(codepoint_t *buf, int off, int len, int skip)
+{
+	while (off < len && skip --) {
+		if (buf[off++] == '\n')
+			break;
+	}
+	return off;
+}
+bool
+utf8::fmt_next(codepoint_t *buf, int *off, int len, int w, int *x, int *y)
+{
+	codepoint_t cp = buf[*off];
+	(*off) ++;
+	if (cp == '\n') {
+		(*y) ++;
+		*x = 0;
+		return false;
+	}
+	(*x) ++;
+	if (*x >= w) {
+		*x = 0;
+		(*y) ++;
+	}
+	return true;
+}
 int
 utf8::from_codepoint(codepoint_t cp, char *out)
 {
