@@ -166,21 +166,16 @@ Edit::show()
 		hh --;
 		yy ++;
 	}
-	for (int pos = off; pos <= len && yy < y + h; pos ++) {
+
+	for (int pos = off; pos <= len && yy < h;) {
 		codepoint_t cp = buf[pos];
-		if (cur == pos)
-			cur_visible = true;
-		scr.clear(xx, yy, 1, 1, (cur == pos)?0xffff:0);
-		if (cp == '\n') {
-			yy ++;
-			xx = x;
-		} else {
-			scr.cell(xx, yy, cp, (cur == pos)?0:0xffff);
-			xx ++;
-			if (xx >= x + w) {
-				xx = x;
-				yy ++;
-			}
+		int ox = xx + x;
+		int oy = yy + y;
+		bool atcur = cur == pos;
+		cur_visible |= atcur;
+		if (utf8::fmt_next(buf, &pos, len, w, &xx, &yy)) {
+			scr.clear(ox, oy, 1, 1, (atcur)?0xffff:0);
+			scr.cell(ox, oy, cp, (atcur)?0:0xffff);
 		}
 	}
 	scr.update();

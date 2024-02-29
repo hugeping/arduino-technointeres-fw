@@ -95,8 +95,7 @@ View::show()
 		hh --;
 		yy ++;
 	}
-	int pos = off;
-	while (pos <= len && yy < h) {
+	for (int pos = off; pos <= len && yy < h;) {
 		codepoint_t cp = buf[pos];
 		int ox = xx + x;
 		int oy = yy + y;
