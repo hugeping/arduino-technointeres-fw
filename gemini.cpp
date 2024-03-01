@@ -56,9 +56,8 @@ Gemini::body()
 			} else {
 				link = line.substring(s);
 			}
-			if (link.startsWith("gemini://") ||
-				link.startsWith("/") ||
-				link.startsWith("./")) {
+			if (!link.startsWith("http:") &&
+				!link.startsWith("https:")) {
 				links[links_nr++] = link;
 				m_links.append(line.c_str() + s);
 			}
@@ -111,10 +110,10 @@ Gemini::reqURI(const char *uri, bool hist)
 		view.title = server;
 		if (!client.connect(server, 1965))
 			return false;
-	} else if ((uri[0] == '/' || uri[0] == '.') && server) {
+	} else if (/*(uri[0] == '/' || uri[0] == '.') && */server) {
 		if (!client.connect(server, 1965))
 			return false;
-		if (uri[0] == '.')
+		if (uri[0] != '/')
 			sprintf(url, "%s/%s", last_url, uri);
 		else
 			sprintf(url, "gemini://%s%s", server, uri);
