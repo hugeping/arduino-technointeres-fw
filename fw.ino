@@ -12,7 +12,7 @@ App app(&main_menu);
 Edit edit_box(scr, kbd, "Edit", 4096);
 Wifilist wifi(scr, kbd);
 Gemini gemini(scr, kbd, sslClient);
-Sensor sensor_app(scr, kbd);
+Sensor sensor(scr, kbd);
 
 void
 setup()
@@ -20,7 +20,7 @@ setup()
 	sslClient.setInsecure();
 	scr.setup();
 	kbd.setup();
-	sensor_app.setup();
+	sensor.setup();
 	app.show();
 }
 
@@ -45,7 +45,7 @@ void loop()
 			app.push(&gemini);
 			break;
 		case 3:
-			app.push(&sensor_app);
+			app.push(&sensor);
 			break;
 		default:
 			break;
