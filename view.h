@@ -2,12 +2,13 @@
 #define __VIEW_H_INCLUDED
 
 class View : public App {
-	const char *title;
 	codepoint_t *buf;
 	Screen &scr;
 	Keyboard &kbd;
 	boolean visible = false;
 public:
+	const char *title;
+
 	int x = 0;
 	int y = 0;
 	int w = COLS;

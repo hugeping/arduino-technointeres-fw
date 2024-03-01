@@ -60,19 +60,32 @@ View::process()
 	while ((c = kbd.input(&sym)) && ret == -1) {
 		switch(c){
 		case KEY_RIGHT:
-		case KEY_DOWN:
 			down();
 			dirty = true;
 			break;
+		case KEY_DOWN:
+			down(h/2);
+			dirty = true;
+			break;
 		case KEY_LEFT:
-		case KEY_UP:
 			up();
 			dirty = true;
 			break;
+		case KEY_UP:
+			up(h/2);
+			dirty = true;
+			break;
 		case KEY_MENU:
+			ret = c;
+			break;
 		case KEY_ENTER:
+			ret = c;
+			break;
 		case KEY_ESC:
 			ret = APP_EXIT;
+			break;
+		case KEY_BS:
+			ret = c;
 			break;
 		default:
 			break;

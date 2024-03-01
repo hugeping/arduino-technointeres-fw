@@ -2,6 +2,8 @@
 #define __APP_H_INCLUDED
 
 #define APP_EXIT -2
+#define APP_MENU -3
+
 class App {
 	App *apps[16];
 	int app_nr = 0;

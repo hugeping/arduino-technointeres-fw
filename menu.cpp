@@ -73,19 +73,27 @@ Menu::process()
 	while ((c = kbd.input()) && ret == -1) {
 		switch(c){
 		case KEY_LEFT:
-		case KEY_UP:
 			sel --;
 			dirty = true;
 			break;
+		case KEY_UP:
+			sel -= h - 1;
+			dirty = true;
+			break;
 		case KEY_RIGHT:
-		case KEY_DOWN:
 			sel ++;
+			dirty = true;
+			break;
+		case KEY_DOWN:
+			sel += h - 1;
 			dirty = true;
 			break;
 		case KEY_ESC:
 			ret = APP_EXIT;
 			break;
 		case KEY_MENU:
+			ret = APP_MENU;
+			break;
 		case KEY_ENTER:
 			ret = sel;
 			break;

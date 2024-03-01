@@ -75,12 +75,9 @@ Screen::draw_text(int x, int y, const char *str, color_t col, color_t bg)
 			y = y + font->h;
 			x = ox;
 		} else {
-			draw_glyph(x, y, cp, col, bg);
+			if (x < W-font->w)
+				draw_glyph(x, y, cp, col, bg);
 			x += font->w;
-			if (x >= W-font->w) {
-				x = 0;
-				y += font->h;
-			}
 		}
 	} while(*ptr && y < H);
 }
@@ -153,14 +150,11 @@ Screen::text(int x, int y, const char *str, color_t fg)
 			c += COLS;
 			x = ox;
 		} else {
-			c[x].glyph = cp;
-			c[x].fg = fg;
-			x ++;
-			if (x >= COLS) {
-				x = 0;
-				y ++;
-				c += COLS;
+			if (x < COLS) {
+				c[x].glyph = cp;
+				c[x].fg = fg;
 			}
+			x ++;
 		}
 	} while(*ptr && y < ROWS);
 }
