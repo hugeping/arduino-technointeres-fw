@@ -6,6 +6,7 @@ class App {
 	App *apps[16];
 	int app_nr = 0;
 public:
+	virtual void setup() {};
 	void reset() { app_nr = 0; };
 	App() {};
 	App(App *app) {
