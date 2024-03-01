@@ -88,6 +88,7 @@ Menu::process()
 			sel += h - 1;
 			dirty = true;
 			break;
+		case KEY_BS:
 		case KEY_ESC:
 			ret = APP_EXIT;
 			break;

@@ -64,7 +64,7 @@ View::process()
 			dirty = true;
 			break;
 		case KEY_DOWN:
-			down(h/2);
+			down(h-1);
 			dirty = true;
 			break;
 		case KEY_LEFT:
@@ -72,7 +72,7 @@ View::process()
 			dirty = true;
 			break;
 		case KEY_UP:
-			up(h/2);
+			up(h-1);
 			dirty = true;
 			break;
 		case KEY_MENU:

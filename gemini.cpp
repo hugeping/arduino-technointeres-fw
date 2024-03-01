@@ -35,6 +35,27 @@ Gemini::req(const char* req)
 	return true;
 }
 
+
+static
+bool is_space(char c)
+{
+	return c == ' ' || c == '\t';
+}
+
+static
+int skip_spaces(String &line, int i)
+{
+	while (is_space(line[i])) i++;
+	return i;
+}
+static
+int find_space(String &line, int s)
+{
+	for (int i = s; i < line.length(); i ++)
+		if (is_space(line[i]))
+			return i;
+	return -1;
+}
 void
 Gemini::body()
 {
@@ -45,13 +66,13 @@ Gemini::body()
 		String line = client.readStringUntil('\n');
 		line.replace("\r", "");
 		if (line.startsWith("=>")) {
-			int s = 2;
-			while (line[s] == ' ') s++;
 			String link;
-			int idx = line.indexOf(' ', s);
-			if (idx > 0) {
+			line.trim();
+			int s = skip_spaces(line, 2);
+			int idx = find_space(line, s);
+			if (idx >=0) {
 				link = line.substring(s, idx);
-				while (line[idx] == ' ') idx ++;
+				idx = skip_spaces(line, idx);
 				line.remove(s, idx - s);
 			} else {
 				link = line.substring(s);

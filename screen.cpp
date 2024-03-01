@@ -42,12 +42,14 @@ Screen::lookup_glyph(codepoint_t cp)
 }
 
 void
-Screen::draw_glyph(int x, int y, uint16_t cp, color_t col, color_t bg)
+Screen::draw_glyph(int x, int y, codepoint_t cp, color_t col, color_t bg)
 {
 	int yy, xx;
 	const uint8_t *p = lookup_glyph(cp);
-	if (!p)
+	if (!p) {
+		tft.fillRect(x, y, font->w, font->h, bg);
 		return;
+	}
 	tft.setWindow(x, y, x + font->w - 1, y + font->h - 1);
 	for (yy = 0; yy < font->h; yy++) {
 		uint8_t b = pgm_read_byte(p);
