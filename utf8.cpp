@@ -38,7 +38,7 @@ utf8::fmt_up(codepoint_t *buf, int off, int w)
 int
 utf8::fmt_down(codepoint_t *buf, int off, int len, int skip)
 {
-	while (off < len && skip --) {
+	while (off < len && --skip) {
 		if (buf[off++] == '\n')
 			break;
 	}
@@ -56,8 +56,10 @@ utf8::fmt_next(codepoint_t *buf, int *off, int len, int w, int *x, int *y)
 	}
 	(*x) ++;
 	if (*x >= w) {
+		(*off) --;
 		*x = 0;
 		(*y) ++;
+		return false;
 	}
 	return true;
 }
