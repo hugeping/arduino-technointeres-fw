@@ -5,12 +5,6 @@ Gemini::Gemini(Screen &scr, Keyboard &kbd, WiFiClientSecure &c) : view(scr, kbd,
 {
 }
 
-int
-Gemini::process()
-{
-	return app->process();
-}
-
 bool
 Gemini::select()
 {
@@ -24,7 +18,6 @@ Gemini::select()
 	}
 	client.stop();
 	view.set(out.c_str());
-	app = &view;
-	app->select();
+	set(&view);
 	return true;
 }

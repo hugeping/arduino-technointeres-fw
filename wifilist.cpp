@@ -2,45 +2,47 @@
 #include "internal.h"
 
 static const char *wifi_cancel_menu[] = { "Ok", "Disconnect", NULL };
-Wifilist::Wifilist(Screen &scr, Keyboard &kbd) : wifi_menu (scr, kbd, "WiFi", 64),
-	wifi_cancel(scr, kbd, NULL, wifi_cancel_menu),
-	wifi_pass(scr, kbd, "Password", 128),
-	info(scr, kbd, "Info")
+Wifilist::Wifilist(Screen &scr, Keyboard &kbd) : m_wifi(scr, kbd, "WiFi", 64),
+	m_cancel(scr, kbd, NULL, wifi_cancel_menu),
+	e_pass(scr, kbd, "Password", 128),
+	v_info(scr, kbd, "Info")
 {
-	wifi_pass.oneline = true;
-	wifi_pass.set("");
-	wifi_cancel.h = 2;
-	wifi_cancel.y = ROWS-2;
+	e_pass.oneline = true;
+	e_pass.set("");
+	m_cancel.h = 2;
+	m_cancel.y = ROWS-2;
 }
 
 int
 Wifilist::process()
 {
-	int m = app->process();
-	if (app == &wifi_menu && m >= 0) {
-		app = &wifi_pass;
-		app->select();
-	} else if (app == &wifi_cancel) {
+	int m = app()->process();
+	if (app() == &m_wifi && m >= 0) {
+		push(&e_pass);
+	} else if (app() == &m_cancel) {
 		if (m == APP_EXIT || m == 0)
 			return APP_EXIT;
 		if (m == 1) { /* cancel */
 			WiFi.disconnect(true);
 			return APP_EXIT;
 		}
-	} else if (app == &wifi_pass) {
-		if (m == APP_EXIT)
-			return APP_EXIT;
+	} else if (app() == &e_pass) {
+		if (m == APP_EXIT) {
+			pop();
+			return 0;
+		}
 		if (m == KEY_ENTER) {
-			WiFi.begin(wifi_menu.selected(), wifi_pass.text());
+			WiFi.begin(m_wifi.selected(), e_pass.text());
 			return APP_EXIT;
 		}
 	}
-	return 0;
+	return m;
 }
 
 bool
 Wifilist::select()
 {
+	reset();
 	static const char *statuses[] = { "Idle",
 		"No SSID", "SCAN", "CONNECTED", "FAILED",
 		"LOST", "DISCONNECTED" };
@@ -51,21 +53,21 @@ Wifilist::select()
 			WiFi.SSID().c_str(),
 			WiFi.localIP().toString().c_str(),
 			statuses[status]);
-		info.set(fmt);
-		info.show();
-		wifi_cancel.sel = 0;
-		app = &wifi_cancel;
-		app->select();
+		v_info.set(fmt);
+		v_info.show();
+		m_cancel.sel = 0;
+		set(&m_cancel);
 		return true;
 	}
-	wifi_menu.reset();
-	wifi_menu.append("Подождите...");
-	wifi_menu.show();
-	app = &wifi_menu;
+	WiFi.disconnect(true);
+	m_wifi.reset();
+	m_wifi.append("Подождите...");
+	m_wifi.show();
+
 	int nr = WiFi.scanNetworks();
-	wifi_menu.reset();
+	m_wifi.reset();
 	for (int net = 0; net < nr; net ++)
-		wifi_menu.append(WiFi.SSID(net).c_str());
-	wifi_menu.show();
+		m_wifi.append(WiFi.SSID(net).c_str());
+	set(&m_wifi);
 	return true;
 }
