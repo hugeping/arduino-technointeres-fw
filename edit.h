@@ -1,10 +1,5 @@
 #ifndef __EDIT_H_INCLUDED
 #define __EDIT_H_INCLUDED
-#include <Arduino.h>
-#include "app.h"
-#include "keys.h"
-#include "screen.h"
-#include "utf8.h"
 
 class Edit : public App {
 	const char *title;

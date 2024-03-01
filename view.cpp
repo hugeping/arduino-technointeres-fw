@@ -1,4 +1,5 @@
-#include "view.h"
+#include "external.h"
+#include "internal.h"
 
 View::View(Screen &screen, Keyboard &keys, const char *t) : scr(screen), kbd(keys), title(t)
 {

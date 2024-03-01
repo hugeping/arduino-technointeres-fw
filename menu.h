@@ -1,9 +1,5 @@
 #ifndef __MENU_H_INCLUDED
 #define __MENU_H_INCLUDED
-#include <Arduino.h>
-#include "app.h"
-#include "keys.h"
-#include "screen.h"
 
 class Menu : public App {
 	const char *title;

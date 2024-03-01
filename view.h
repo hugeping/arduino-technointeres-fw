@@ -1,10 +1,5 @@
 #ifndef __VIEW_H_INCLUDED
 #define __VIEW_H_INCLUDED
-#include <Arduino.h>
-#include "app.h"
-#include "keys.h"
-#include "screen.h"
-#include "utf8.h"
 
 class View : public App {
 	const char *title;

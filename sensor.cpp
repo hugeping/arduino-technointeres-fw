@@ -1,4 +1,5 @@
-#include "sensor.h"
+#include "external.h"
+#include "internal.h"
 static SHT3x sensor;
 
 Sensor::Sensor(Screen &screen, Keyboard &keys) : scr(screen), kbd(keys), t(0), h(0)

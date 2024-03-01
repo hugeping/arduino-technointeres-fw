@@ -1,9 +1,5 @@
 #ifndef __SENSOR_H_INCLUDED
 #define __SENSOR_H_INCLUDED
-#include "app.h"
-#include "keys.h"
-#include "screen.h"
-#include <SHT3x.h>
 
 class Sensor : public App {
 	SHT3x sensor;

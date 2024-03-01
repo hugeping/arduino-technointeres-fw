@@ -1,5 +1,5 @@
-#include <string.h>
-#include "menu.h"
+#include "external.h"
+#include "internal.h"
 
 Menu::Menu(Screen &screen, Keyboard &keys, const char *t, int sz) : scr(screen), kbd(keys), size(sz), title(t)
 {

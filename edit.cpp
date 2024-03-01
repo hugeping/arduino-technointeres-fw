@@ -1,4 +1,6 @@
-#include "edit.h"
+#include "external.h"
+#include "internal.h"
+
 static char *text_buf = NULL;
 static int text_size = -1;
 
