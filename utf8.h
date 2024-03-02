@@ -2,7 +2,7 @@
 #define __UTF8_H_INCLUDED
 #include <stdint.h>
 #include <stddef.h>
-typedef uint32_t codepoint_t;
+typedef uint16_t codepoint_t;
 class utf8
 {
 public:

@@ -2,13 +2,13 @@
 #define __EDIT_H_INCLUDED
 
 class Edit : public App {
-	const char *title;
 	codepoint_t *buf;
 	Screen &scr;
 	Keyboard &kbd;
 	boolean cur_visible;
 	void visible();
 public:
+	const char *title;
 	boolean oneline = false;
 	int x = 0;
 	int y = 0;

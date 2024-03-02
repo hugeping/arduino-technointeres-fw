@@ -6,6 +6,7 @@ class Gemini : public App {
 	View view;
 	Menu m_links;
 	View v_status;
+	Edit e_input;
 	WiFiClientSecure &client;
 	char status[3];
 	char meta[1025];
@@ -19,9 +20,12 @@ class Gemini : public App {
 	int hist_pos;
 	bool req(const char *req);
 	void body();
+	void input(const char *msg);
+	bool reqURI(const char *uri, bool history);
+	void message(const char *msg);
 public:
 	int process();
-	bool reqURI(const char *uri, bool history = true);
+	bool request(const char *uri, bool hist = true);
 	Gemini(Screen &scr, Keyboard &kbd, WiFiClientSecure &c);
 	~Gemini() { free(server); free(last_url); };
 	bool select();

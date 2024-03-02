@@ -4,8 +4,10 @@
 Gemini::Gemini(Screen &scr, Keyboard &kbd, WiFiClientSecure &c) :
 	view(scr, kbd, "Gemini"), client(c),
 	v_status(scr, kbd, "Status"),
-	m_links(scr, kbd, "Links", MAX_LINKS)
+	m_links(scr, kbd, "Links", MAX_LINKS),
+	e_input(scr, kbd, NULL, 1024)
 {
+	e_input.oneline = true;
 }
 
 bool
@@ -142,16 +144,75 @@ Gemini::reqURI(const char *uri, bool hist)
 		last_url = strdup(url);
 	} else
 		return false;
-
 	normpath(last_url + 9);
-	if (!req(last_url) || status[0] != '2') {
-		char fmt[256];
-		sprintf(fmt, "%s\nStatus:%s", last_url, status);
-		view.set(fmt);
-		view.show();
+	return req(last_url);
+}
+
+void
+Gemini::message(const char *msg)
+{
+	view.set(msg);
+	view.show();
+}
+
+void
+Gemini::input(const char *msg)
+{
+	e_input.title = msg;
+	push(&e_input);
+}
+
+bool
+Gemini::request(const char *uri, bool hist)
+{
+	char fmt[1024];
+	bool redirect = false;
+	view.set("Connecting...");
+	view.show();
+	do {
+		if (!reqURI(uri, hist)) {
+			client.stop();
+			sprintf(fmt, "%s\nConnection error", last_url);
+			message(fmt);
+			return false;
+		} if (status[0] == '1') {
+			client.stop();
+			input(meta);
+			return true;
+		} else if (status[0] == '2') {
+			body();
+			client.stop();
+			view.show();
+			return true;
+		} else if (status[0] == '3') {
+			client.stop();
+			if (redirect) {
+				message("Multiple redirects");
+				return false;
+			}
+			uri = meta;
+			redirect = true;
+			continue;
+		}
+		client.stop();
+		sprintf(fmt, "%s\nStatus: %s", last_url, status);
+		message(fmt);
 		return false;
+	} while(1);
+}
+static void
+url_encode(char *dst, const char *src)
+{
+	while (*src) {
+		if (*src == ' ' || *src == '\t' || *src == '%' ||
+			*src == '/' || *src == '.' || *src == '?') {
+			sprintf(dst, "%%%02x", *src);
+			dst += 3;
+			src ++;
+		} else
+			*dst ++ = *src ++;
 	}
-	return true;
+	*dst = *src;
 }
 
 int
@@ -160,13 +221,22 @@ Gemini::process()
 	int m = app()->process();
 	if (app() == &view && m == KEY_MENU) {
 		push(&m_links);
+	} else if (app() == &e_input) {
+		char req[1024];
+		if (m == KEY_ENTER) {
+			pop();
+			req[0] = '?';
+			url_encode(&req[1], e_input.text());
+			request(req);
+			return 0;
+		} else if(m == APP_EXIT) {
+			pop();
+			return 0;
+		}
 	} else if (app() == &m_links) {
 		if (m >= 0) {
-			if (reqURI(links[m].c_str()))
-				body();
-//			view.set(links[m].c_str());
-			client.stop();
 			pop();
+			request(links[m].c_str());
 		}
 		if (m == APP_EXIT) {
 			pop();
@@ -175,10 +245,7 @@ Gemini::process()
 	} else if (app() == &view && m == KEY_BS) {
 		if (hist_size > 0) {
 			hist_size --;
-			if (reqURI(history[(--hist_pos)%hist_max].c_str(), false)) {
-				body();
-				view.show();
-			}
+			request(history[(--hist_pos)%hist_max].c_str(), false);
 		}
 	}
 	return m;
@@ -187,12 +254,8 @@ Gemini::process()
 bool
 Gemini::select()
 {
-	if (!server) {
-		if (!reqURI("gemini://hugeping.ru"))
-			return false;
-		body();
-		client.stop();
-	}
 	set(&view);
+	if (!server)
+		request("gemini://hugeping.ru");
 	return true;
 }
