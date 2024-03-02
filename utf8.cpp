@@ -126,3 +126,11 @@ utf8::len(const char *p)
 	}
 	return sz;
 }
+
+const char *
+utf8::index(const char *p, int pos)
+{
+	while (*p && pos --)
+		p = to_codepoint(p);
+	return p;
+}

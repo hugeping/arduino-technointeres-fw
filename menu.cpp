@@ -46,7 +46,7 @@ Menu::show()
 	scr.clear(x, y, w, h, 0);
 	if (title) {
 		scr.clear(x, y, w, 1, scr.color(0, 128, 128));
-		scr.text(x, y, title, scr.color(255, 255, 0));
+		scr.text(x, y, title + title_offset, scr.color(255, 255, 0));
 		hh --;
 		yy ++;
 	}
@@ -54,11 +54,17 @@ Menu::show()
 		return;
 	int nr = (sel / hh)*hh;
 	for (int pos = nr; pos < len && yy < y + h; pos ++) {
-		if (pos == sel)
+		const char *text = list[pos].c_str();
+		if (pos == sel) {
+			int n = utf8::len(text) - w;
+			if (n > 0) {
+				n = n - abs(n - (sel_offset)%(2*n));
+				text = utf8::index(text, n);
+			}
 			scr.clear(x, yy, w, 1, scr.color(0, 0, 255));
-		else
+		} else
 			scr.clear(x, yy, w, 1, 0);
-		scr.text(x, yy, list[pos].c_str());
+		scr.text(x, yy, text);
 		yy ++;
 	}
 	scr.update();
@@ -105,6 +111,17 @@ Menu::process()
 	sel = max(0, sel);
 	sel = min(sel, len - 1);
 	// scr.text(0, 16, String(sel).c_str());
+	if (!dirty && len > 0) {
+		static int otick = 0;
+		int ll = utf8::len(list[sel].c_str());
+		int tick = (millis()-otick) > 150;
+		if (ll > w && tick) {
+			otick = millis();
+			dirty = true;
+			sel_offset ++;
+		}
+	} else
+		sel_offset = 0;
 	if (dirty)
 		show();
 	return ret;
