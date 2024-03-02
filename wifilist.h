@@ -6,9 +6,11 @@ class Wifilist : public App {
 	Menu m_cancel;
 	Menu m_wifi;
 	View v_info;
+	Preferences prefs;
 public:
 
 	Wifilist(Screen &scr, Keyboard &kbd);
+	void setup();
 	bool select();
 	int process();
 };

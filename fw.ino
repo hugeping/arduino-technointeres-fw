@@ -21,6 +21,7 @@ setup()
 	scr.setup();
 	kbd.setup();
 	sensor.setup();
+	wifi.setup();
 	app.show();
 }
 

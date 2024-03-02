@@ -12,7 +12,16 @@ Wifilist::Wifilist(Screen &scr, Keyboard &kbd) : m_wifi(scr, kbd, "WiFi", 64),
 	m_cancel.h = 2;
 	m_cancel.y = ROWS-2;
 }
-
+void
+Wifilist::setup()
+{
+	prefs.begin("wifi", true);
+	String ssid = prefs.getString("ssid");
+	String passwd = prefs.getString("passwd");
+	if (ssid != "" && passwd != "")
+		WiFi.begin(ssid, passwd);
+	prefs.end();
+}
 int
 Wifilist::process()
 {
@@ -24,6 +33,10 @@ Wifilist::process()
 			return APP_EXIT;
 		if (m == 1) { /* cancel */
 			WiFi.disconnect(true);
+			prefs.begin("wifi", false);
+			prefs.remove("ssid");
+			prefs.remove("passwd");
+			prefs.end();
 			return APP_EXIT;
 		}
 	} else if (app() == &e_pass) {
@@ -33,6 +46,10 @@ Wifilist::process()
 		}
 		if (m == KEY_ENTER) {
 			WiFi.begin(m_wifi.selected(), e_pass.text());
+			prefs.begin("wifi", false);
+			prefs.putString("ssid", m_wifi.selected());
+			prefs.putString("passwd", e_pass.text());
+			prefs.end();
 			return APP_EXIT;
 		}
 	}
