@@ -5,9 +5,11 @@ Gemini::Gemini(Screen &scr, Keyboard &kbd, WiFiClientSecure &c) :
 	view(scr, kbd, "Gemini"), client(c),
 	v_status(scr, kbd, "Status"),
 	m_links(scr, kbd, "Links", MAX_LINKS),
-	e_input(scr, kbd, NULL, 1024)
+	e_input(scr, kbd, NULL, 1024),
+	e_addr(scr, kbd, "Enter uri", 256)
 {
 	e_input.oneline = true;
+	e_addr.oneline = true;
 }
 
 bool
@@ -63,6 +65,7 @@ Gemini::body()
 {
 	String out; // = String(last_url)+"\n";
 	m_links.reset();
+	m_links.append("[Enter address]");
 	links_nr = 0;
 	while (client.connected() || client.available()) {
 		String line = client.readStringUntil('\n');
@@ -200,12 +203,30 @@ Gemini::request(const char *uri, bool hist)
 		return false;
 	} while(1);
 }
+
+static bool
+is_esc(char c)
+{
+	switch(c) {
+	case ' ':
+	case '\t':
+	case '%':
+	case '/':
+	case '.':
+	case '?':
+	case '!':
+	case ':':
+		return true;
+	default:
+		return false;
+	}
+}
+
 static void
 url_encode(char *dst, const char *src)
 {
 	while (*src) {
-		if (*src == ' ' || *src == '\t' || *src == '%' ||
-			*src == '/' || *src == '.' || *src == '?') {
+		if (is_esc(*src)) {
 			sprintf(dst, "%%%02x", *src);
 			dst += 3;
 			src ++;
@@ -218,11 +239,21 @@ url_encode(char *dst, const char *src)
 int
 Gemini::process()
 {
+	char req[1024];
 	int m = app()->process();
 	if (app() == &view && m == KEY_MENU) {
 		push(&m_links);
+	} else if (app() == &e_addr) {
+		if (m == KEY_ENTER) {
+			pop();
+			sprintf(req, "gemini://%s", e_addr.text());
+			request(req);
+			return 0;
+		} else if(m == APP_EXIT) {
+			pop();
+			return 0;
+		}
 	} else if (app() == &e_input) {
-		char req[1024];
 		if (m == KEY_ENTER) {
 			pop();
 			req[0] = '?';
@@ -234,9 +265,11 @@ Gemini::process()
 			return 0;
 		}
 	} else if (app() == &m_links) {
-		if (m >= 0) {
+		if (m == 0)
+			set(&e_addr);
+		else if (m > 0) {
 			pop();
-			request(links[m].c_str());
+			request(links[m-1].c_str());
 		}
 		if (m == APP_EXIT) {
 			pop();

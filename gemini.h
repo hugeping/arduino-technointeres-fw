@@ -7,6 +7,7 @@ class Gemini : public App {
 	Menu m_links;
 	View v_status;
 	Edit e_input;
+	Edit e_addr;
 	WiFiClientSecure &client;
 	char status[3];
 	char meta[1025];
