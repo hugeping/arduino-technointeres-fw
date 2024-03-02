@@ -12,6 +12,40 @@ Gemini::Gemini(Screen &scr, Keyboard &kbd, WiFiClientSecure &c) :
 	e_addr.oneline = true;
 }
 
+static bool
+is_esc(char c)
+{
+	switch(c) {
+	case ' ':
+	case '\t':
+	case '%':
+	case '/':
+	case '-':
+	case '.':
+	case '?':
+	case '!':
+	case ':':
+		return true;
+	default:
+		return false;
+	}
+}
+
+static void
+url_encode(char *dst, const char *src)
+{
+	while (*src) {
+		if (is_esc(*src)) {
+			sprintf(dst, "%%%02x", *src);
+			dst += 3;
+			src ++;
+		} else
+			*dst ++ = *src ++;
+	}
+	*dst = *src;
+}
+
+
 bool
 Gemini::req(const char* req)
 {
@@ -103,11 +137,13 @@ normpath(char *path)
 		if (src[0] == '.') {
 			if (src[1] == '/') {
 				src += 2;
+				continue;
 			} else if(src[1] == '.' && src[2] == '/') {
 				if (dst > path)
 					dst --;
-				while (dst > path && *(--dst) != '/');
+				while (dst > path && *(dst-1) != '/') dst--;
 				src += 3;
+				continue;
 			}
 		}
 		do {
@@ -116,7 +152,16 @@ normpath(char *path)
 		src += strspn(src, "/");
 	}
 }
-
+static char*
+dirpath(char *path)
+{
+	if (!path[strcspn(path, "/")])
+		return path;
+	char *eptr = path + strlen(path);
+	while (*(--eptr) != '/');
+	*eptr = 0;
+	return path;
+}
 bool
 Gemini::reqURI(const char *uri, bool hist)
 {
@@ -140,7 +185,10 @@ Gemini::reqURI(const char *uri, bool hist)
 		if (!client.connect(server, 1965))
 			return false;
 		if (uri[0] != '/')
-			sprintf(url, "%s/%s", last_url, uri);
+			if (uri[0] == '?')
+				sprintf(url, "%s/%s", last_url, uri);
+			else
+				sprintf(url, "%s/%s", dirpath(last_url), uri);
 		else
 			sprintf(url, "gemini://%s%s", server, uri);
 		free(last_url);
@@ -202,38 +250,6 @@ Gemini::request(const char *uri, bool hist)
 		message(fmt);
 		return false;
 	} while(1);
-}
-
-static bool
-is_esc(char c)
-{
-	switch(c) {
-	case ' ':
-	case '\t':
-	case '%':
-	case '/':
-	case '.':
-	case '?':
-	case '!':
-	case ':':
-		return true;
-	default:
-		return false;
-	}
-}
-
-static void
-url_encode(char *dst, const char *src)
-{
-	while (*src) {
-		if (is_esc(*src)) {
-			sprintf(dst, "%%%02x", *src);
-			dst += 3;
-			src ++;
-		} else
-			*dst ++ = *src ++;
-	}
-	*dst = *src;
 }
 
 int
