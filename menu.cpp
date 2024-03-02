@@ -56,15 +56,12 @@ Menu::show()
 	for (int pos = nr; pos < len && yy < y + h; pos ++) {
 		const char *text = list[pos].c_str();
 		if (pos == sel) {
-			int n = utf8::len(text) - w;
-			if (n > 0) {
-				n = n - abs(n - (sel_offset)%(2*n));
-				text = utf8::index(text, n);
-			}
 			scr.clear(x, yy, w, 1, scr.color(0, 0, 255));
-		} else
+			scr.text_scrolled(x, yy, text, w, sel_offset);
+		} else {
 			scr.clear(x, yy, w, 1, 0);
-		scr.text(x, yy, text);
+			scr.text(x, yy, text);
+		}
 		yy ++;
 	}
 	scr.update();
@@ -112,11 +109,8 @@ Menu::process()
 	sel = min(sel, len - 1);
 	// scr.text(0, 16, String(sel).c_str());
 	if (!dirty && len > 0) {
-		static int otick = 0;
-		int ll = utf8::len(list[sel].c_str());
-		int tick = (millis()-otick) > 150;
-		if (ll > w && tick) {
-			otick = millis();
+		static long otick = 0;
+		if (scr.text_scroll(list[sel].c_str(), w, &otick)) {
 			dirty = true;
 			sel_offset ++;
 		}

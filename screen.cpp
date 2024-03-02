@@ -139,6 +139,30 @@ Screen::cell(int x, int y, codepoint_t cp, color_t fg)
 }
 
 void
+Screen::text_scrolled(int x, int y, const char *t, int w, int offset)
+{
+	int n = utf8::len(t) - w;
+	if (n > 0) {
+		n = n - abs(n - (offset)%(2*n));
+		t = utf8::index(t, n);
+	}
+	text(x, y, t);
+}
+
+bool
+Screen::text_scroll(const char *str, int w, long *otick)
+{
+	bool dirty = false;
+	int ll = utf8::len(str);
+	int tick = (millis()-*otick) > 150;
+	if (ll > w && tick) {
+		*otick = millis();
+		dirty = true;
+	}
+	return dirty;
+}
+
+void
 Screen::text(int x, int y, const char *str, color_t fg)
 {
 	const char *ptr = str;

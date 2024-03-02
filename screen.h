@@ -40,6 +40,8 @@ public:
 	void text(int x, int y, const char *str, color_t fg = 0xffff);
 	void update();
 	color_t color(byte r, byte g, byte b);
+	bool text_scroll(const char *str, int w, long *otick);
+	void text_scrolled(int x, int y, const char *text, int w, int offset);
 };
 
 //extern Screen *gscr;
