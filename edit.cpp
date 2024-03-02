@@ -158,8 +158,8 @@ void
 Edit::show()
 {
 	int hh = h;
-	int yy = y;
-	int xx = x;
+	int yy = 0;
+	int xx = 0;
 	cur_visible = false;
 	scr.clear(x, y, w, h, 0);
 	if (title) {
@@ -175,10 +175,9 @@ Edit::show()
 		int oy = yy + y;
 		bool atcur = cur == pos;
 		cur_visible |= atcur;
-		if (utf8::fmt_next(buf, &pos, len, w, &xx, &yy)) {
-			scr.clear(ox, oy, 1, 1, (atcur)?0xffff:0);
+		scr.clear(ox, oy, 1, 1, (atcur)?0xffff:0);
+		if (utf8::fmt_next(buf, &pos, len, w, &xx, &yy))
 			scr.cell(ox, oy, cp, (atcur)?0:0xffff);
-		}
 	}
 	scr.update();
 }

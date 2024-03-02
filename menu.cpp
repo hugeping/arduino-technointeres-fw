@@ -46,7 +46,7 @@ Menu::show()
 	scr.clear(x, y, w, h, 0);
 	if (title) {
 		scr.clear(x, y, w, 1, scr.color(0, 128, 128));
-		scr.text(x, y, title + title_offset, scr.color(255, 255, 0));
+		scr.text(x, y, title, scr.color(255, 255, 0));
 		hh --;
 		yy ++;
 	}

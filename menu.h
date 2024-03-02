@@ -6,7 +6,6 @@ class Menu : public App {
 	String *list;
 	Screen &scr;
 	Keyboard &kbd;
-	int title_offset = 0;
 	int sel_offset = 0;
 public:
 	int size = 0;
