@@ -56,7 +56,7 @@ utf8::fmt_next(codepoint_t *buf, int *off, int len, int w, int *x, int *y)
 	}
 	(*x) ++;
 	if (*x >= w) {
-		(*off) --;
+		//(*off) --;
 		*x = 0;
 		(*y) ++;
 		return false;

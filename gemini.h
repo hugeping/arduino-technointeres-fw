@@ -24,6 +24,8 @@ class Gemini : public App {
 	void input(const char *msg);
 	bool reqURI(const char *uri, bool history);
 	void message(const char *msg);
+	void menu_reset();
+	Preferences prefs;
 public:
 	int process();
 	bool request(const char *uri, bool hist = true);

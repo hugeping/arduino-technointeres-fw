@@ -3,34 +3,19 @@
 
 View::View(Screen &screen, Keyboard &keys, const char *t) : scr(screen), kbd(keys), title(t)
 {
-	size = 256;
-	buf = new codepoint_t[size+1];
 }
 
 View::~View()
 {
-	delete buf;
+	reset();
 }
 
 void
 View::set(const char *text)
 {
-	int sz = utf8::len(text);
-	if (sz > size) {
-		delete(buf);
-		buf = new codepoint_t[sz+1];
-		size = sz;
-	}
-	const char *ptr = text;
-	codepoint_t cp;
-	int i = 0;
-	while (*ptr && i < size) {
-		ptr = utf8::to_codepoint(ptr, &cp);
-		buf[i++] = cp;
-	}
-	buf[i] = 0;
-	len = i;
-	off = 0;
+	reset();
+	append(text);
+	cur = start;
 }
 
 void
@@ -38,15 +23,23 @@ View::down(int nr)
 {
 	if (visible)
 		return;
-	for (int i = 0; i<nr; i++)
-		off = utf8::fmt_down(buf, off, len, w);
+	for (int i = 0; i<nr; i++) {
+		if (cur && cur->next)
+			cur = cur->next;
+		else
+			break;
+	}
 }
 
 void
 View::up(int nr)
 {
-	for (int i = 0; i < nr && off; i ++)
-		off = utf8::fmt_up(buf, off, w);
+	for (int i = 0; i<nr; i++) {
+		if (cur && cur->prev)
+			cur = cur->prev;
+		else
+			break;
+	}
 }
 
 int
@@ -95,31 +88,93 @@ View::process()
 		show();
 	return ret;
 }
+void
+View::reset()
+{
+	while (start) {
+		struct line_t *p = start;
+		start = start->next;
+		free(p);
+	}
+	start = NULL;
+	cur = NULL;
+}
+
+void
+View::append(const char *text)
+{
+	int sz = utf8::len(text);
+	codepoint_t *buf;
+	codepoint_t cp;
+	struct line_t *ln = (struct line_t*)malloc(sizeof(struct line_t)
+		+ (sz+1)*sizeof(codepoint_t));
+	int i;
+	if (!ln)
+		return;
+	ln->next = NULL;
+	ln->len = 0;
+	if (!start) {
+		start = ln;
+		ln->prev = NULL;
+		cur = ln;
+	} else {
+		struct line_t *p = start;
+		while (p->next) p = p->next;
+		p->next = ln;
+		ln->prev = p;
+	}
+	buf = (codepoint_t *)(ln + 1);
+	ln->buf = buf;
+	for(i = 0; i<sz && *text; i++) {
+		text = utf8::to_codepoint(text, &cp);
+		buf[i] = cp;
+	}
+	int xx = 0;
+	int yy = 0;
+	i = 0;
+	int last_i = 0;
+	while (i < sz) {
+		int ox = xx;
+		int oy = yy;
+		utf8::fmt_next(buf, &i, sz, w, &xx, &yy);
+		if (yy > oy || i == sz) {
+			ln->len = i - last_i;
+			last_i = i;
+			ln->next = NULL;
+			if (i < sz) {
+				struct line_t *nl = (struct line_t*)malloc(sizeof(struct line_t));
+				if (!nl)
+					return;
+				nl->buf = buf + i;
+				nl->prev = ln;
+				ln->next = nl;
+				ln = nl;
+			}
+		}
+	}
+}
 
 void
 View::show()
 {
 	int hh = h;
-	int yy = 0;
-	int xx = 0;
+	int yy = y;
+	int xx = x;
 	scr.clear(x, y, w, h, 0);
-	if (!buf)
-		return;
 	if (title) {
 		scr.clear(x, y, w, 1, scr.color(0, 128, 128));
 		scr.text(x, y, title, scr.color(255, 255, 0));
 		hh --;
 		yy ++;
 	}
-	for (int pos = off; pos <= len && yy < h;) {
-		codepoint_t cp = buf[pos];
-		int ox = xx + x;
-		int oy = yy + y;
-		visible = pos == len;
-		if (utf8::fmt_next(buf, &pos, len, w, &xx, &yy)) {
-			scr.clear(ox, oy, 1, 1, 0);
-			scr.cell(ox, oy, cp, 0xffff);
+	struct line_t *pos = cur;
+	for (;pos && hh -- > 0; pos = pos->next) {
+		for (int i = 0; i < pos->len && i < w; i ++) {
+			scr.clear(xx + i, yy, 1, 1, 0);
+			scr.cell(xx + i, yy, pos->buf[i], 0xffff);
 		}
+		yy ++;
 	}
+	visible = !pos;
 	scr.update();
 }

@@ -94,13 +94,20 @@ int find_space(String &line, int s)
 			return i;
 	return -1;
 }
+
+void
+Gemini::menu_reset()
+{
+	m_links.reset();
+	m_links.append("[Enter address]");
+}
+
 void
 Gemini::body()
 {
-	String out; // = String(last_url)+"\n";
-	m_links.reset();
-	m_links.append("[Enter address]");
+	menu_reset();
 	links_nr = 0;
+	view.reset();
 	while (client.connected() || client.available()) {
 		String line = client.readStringUntil('\n');
 		line.replace("\r", "");
@@ -122,9 +129,9 @@ Gemini::body()
 				m_links.append(line.c_str() + s);
 			}
 		}
-		out += line + "\n";
+		view.append(line.c_str());
 	}
-	view.set(out.c_str());
+
 }
 
 static void
@@ -234,6 +241,9 @@ Gemini::request(const char *uri, bool hist)
 			body();
 			client.stop();
 			view.show();
+			prefs.begin("gemini", false);
+			prefs.putString("last_url", last_url);
+			prefs.end();
 			return true;
 		} else if (status[0] == '3') {
 			client.stop();
@@ -304,7 +314,15 @@ bool
 Gemini::select()
 {
 	set(&view);
-	if (!server)
-		request("gemini://hugeping.ru");
+	if (!server) {
+		menu_reset();
+		prefs.begin("gemini", true);
+		String url = prefs.getString("last_url");
+		if (url == "")
+			request("gemini://geminispace.info");
+		else
+			request(url.c_str());
+		prefs.end();
+	}
 	return true;
 }
