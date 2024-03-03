@@ -13,6 +13,7 @@ class Irc : public App {
 	char nick[64];
 	char host[64];
 	char channel[64];
+	char title[64];
 	bool connect(const char *host, int port);
 	void irc_reply(char *cmd);
 	void irc_input(char *cmd);

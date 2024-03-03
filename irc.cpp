@@ -14,6 +14,8 @@ Irc::Irc(Screen &scr, Keyboard &kbd, WiFiClient &c, WiFiClientSecure &sc) :
 	sprintf(nick, "esp-%02x", random()&0xff);
 	sprintf(host, "esp32-c3");
 	channel[0] = 0;
+	sprintf(title, "IRC");
+	view.title = title;
 }
 
 static char*
@@ -114,6 +116,7 @@ Irc::irc_input(char *s)
 			return;
 		}
 	}
+	privmsg(channel, s);
 	return;
 }
 
@@ -183,6 +186,7 @@ Irc::process()
 			e_input.set("");
 			e_input.show();
 			irc_input(fmt);
+			sprintf(title, "%s %s", server, channel);
 			tail();
 		}
 	}
@@ -194,7 +198,7 @@ Irc::connect(const char *host, int port)
 {
 	cli = &client;
 	view.show();
-	if (!cli->connect(host, 6667)) {
+	if (!cli->connect(host, port)) {
 		view.append("Can't connect...");
 		return false;
 	}
@@ -209,6 +213,7 @@ Irc::select()
 	view.show();
 	set(&e_input);
 	if (connect(server, port)) {
+		sprintf(title, "%s", server);
 		char fmt[256];
 		if (pass[0]) {
 			sprintf(fmt, "PASS %s");
