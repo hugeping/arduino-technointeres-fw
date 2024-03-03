@@ -171,7 +171,7 @@ Irc::irc_reply(char *cmd)
 void
 Irc::tail()
 {
-	view.trim_head(view.h*2);
+	view.trim_head(view.h*20);
 	if (app() == &e_input) {
 		view.tail();
 		view.show();
@@ -192,10 +192,10 @@ Irc::process()
 	int m = app()->process();
 	if (app() == &e_input) {
 		if (m == KEY_UP) {
-			view.up();
+			view.up(view.h-1);
 			view.show();
 		} else if (m == KEY_DOWN) {
-			view.down();
+			view.down(view.h-1);
 			view.show();
 		} else if (m == KEY_MENU) {
 			select_menu();
