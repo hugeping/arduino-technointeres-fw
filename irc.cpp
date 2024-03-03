@@ -12,8 +12,8 @@ Irc::Irc(Screen &scr, Keyboard &kbd, WiFiClient &c, WiFiClientSecure &sc) :
 	pass[0] = 0;
 	sprintf(server, "irc.oftc.net");
 	sprintf(nick, "esp-%02x", random()&0xff);
-	sprintf(host, "esp32c3");
-	sprintf(channel, "#instead");
+	sprintf(host, "esp32-c3");
+	channel[0] = 0;
 }
 
 static char*
