@@ -10,10 +10,12 @@ class View : public App {
 		struct line_t *prev;
 		codepoint_t *buf;
 		int len;
+		int chunks;
 	};
 
 	struct line_t *start = NULL;
 	struct line_t *cur = NULL;
+	int lines_nr = 0;
 	Screen &scr;
 	Keyboard &kbd;
 	boolean visible = false;
@@ -28,6 +30,8 @@ public:
 	View(Screen &scr, Keyboard &kbd, const char *title);
 
 	~View();
+	void trim_head(int nr);
+	void tail();
 	void append(const char *text);
 	void set(const char *text);
 	void reset();

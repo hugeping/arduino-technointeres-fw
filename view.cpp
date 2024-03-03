@@ -98,6 +98,7 @@ View::reset()
 	}
 	start = NULL;
 	cur = NULL;
+	lines_nr = 0;
 }
 
 void
@@ -113,6 +114,9 @@ View::append(const char *text)
 		return;
 	ln->next = NULL;
 	ln->len = 0;
+	ln->chunks = 0;
+	int *chunks = &ln->chunks;
+	lines_nr ++;
 	if (!start) {
 		start = ln;
 		ln->prev = NULL;
@@ -145,13 +149,55 @@ View::append(const char *text)
 				struct line_t *nl = (struct line_t*)malloc(sizeof(struct line_t));
 				if (!nl)
 					return;
+				nl->chunks = 0;
 				nl->buf = buf + i;
 				nl->prev = ln;
 				ln->next = nl;
 				ln = nl;
+				(*chunks) ++;
+				lines_nr ++;
 			}
 		}
 	}
+}
+
+void
+View::trim_head(int nr)
+{
+	if (lines_nr <= nr)
+		return;
+	nr = lines_nr - nr;
+	struct line_t *pos = start;
+	while (pos && nr > 0) {
+		int chunks = pos->chunks;
+		struct line_t *p = pos;
+		pos = pos->next;
+		free(p);
+		nr --;
+		lines_nr --;
+		while (chunks --) {
+			p = pos;
+			pos = pos->next;
+			free(p);
+			nr --;
+			lines_nr --;
+		}
+		start = pos;
+	}
+	cur = start;
+	if (cur)
+		cur->prev = NULL;
+}
+
+void
+View::tail()
+{
+	struct line_t *pos;
+	for(pos = cur; pos && pos->next; pos = pos->next);
+	if (!pos)
+		return;
+	for (int hh = h - ((title)?1:0); pos && pos->prev && --hh > 0; pos = pos->prev);
+	cur = pos;
 }
 
 void

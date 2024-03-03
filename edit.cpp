@@ -80,6 +80,16 @@ Edit::visible()
 {
 	if (cur_visible)
 		return;
+	if (oneline) {
+		if (cur < off)
+			off = cur - 1;
+		else
+			off = cur - w + 1;
+		off = max(0, off);
+		off = min(off, len);
+		show();
+		return;
+	}
 	if (cur < off)
 		off = utf8::fmt_up(buf, off, w);
 	else
@@ -110,10 +120,18 @@ Edit::process()
 		}
 		switch(c){
 		case KEY_DOWN:
+			if (oneline) {
+				ret = c;
+				break;
+			}
 			down();
 			dirty = true;
 			break;
 		case KEY_UP:
+			if (oneline) {
+				ret = c;
+				break;
+			}
 			up();
 			dirty = true;
 			break;
