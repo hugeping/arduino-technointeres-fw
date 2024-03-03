@@ -145,7 +145,7 @@ Irc::irc_reply(char *cmd)
 		sprintf(fmt, "PONG ", txt);
 		cli->println(fmt);
 	} else {
-		sprintf(fmt, ">< %s (%s): %s", cmd, par, txt);
+		sprintf(fmt, "%s: >< %s (%s): %s", usr, cmd, par, txt);
 		view.append(fmt);
 		if (!strcmp("NICK", cmd) && !strcmp(usr, nick))
 			strcpy(nick, txt);
