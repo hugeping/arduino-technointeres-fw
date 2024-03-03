@@ -56,6 +56,7 @@ Edit::set(const char *text)
 	}
 	buf[i] = 0;
 	len = i;
+	cur = 0;
 }
 
 void
