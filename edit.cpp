@@ -192,11 +192,11 @@ Edit::show()
 		codepoint_t cp = buf[pos];
 		int ox = xx + x;
 		int oy = yy + y;
-		bool atcur = cur == pos;
+		bool atcur = (cur == pos) && active;
 		cur_visible |= atcur;
-		scr.clear(ox, oy, 1, 1, (atcur)?0xffff:0);
+		scr.clear(ox, oy, 1, 1, (atcur)?fg:bg);
 		if (utf8::fmt_next(buf, &pos, len, w, &xx, &yy))
-			scr.cell(ox, oy, cp, (atcur)?0:0xffff);
+			scr.cell(ox, oy, cp, (atcur)?bg:fg);
 	}
 	scr.update();
 }

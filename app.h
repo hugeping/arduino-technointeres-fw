@@ -3,11 +3,14 @@
 
 #define APP_EXIT -2
 #define APP_MENU -3
-
+#include "screen.h"
 class App {
 	App *apps[16];
 	int app_nr = 0;
 public:
+	color_t fg = 0xffff;
+	color_t bg = 0x0;
+	bool active = true;
 	virtual void setup() {};
 	void reset() { app_nr = 0; };
 	App() {};

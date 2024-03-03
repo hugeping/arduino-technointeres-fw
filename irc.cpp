@@ -3,11 +3,24 @@
 
 Irc::Irc(Screen &scr, Keyboard &kbd, WiFiClient &c, WiFiClientSecure &sc) :
 	view(scr, kbd, "Irc"), client(c), sslclient(sc),
-	e_input(scr, kbd, NULL, 256)
+	e_input(scr, kbd, NULL, 250),
+	e_server(scr, kbd, "Server", 64),
+	e_port(scr, kbd, "Port", 64),
+	e_nick(scr, kbd, "Nick", 64),
+	e_passwd(scr, kbd, "Password", 64)
 {
 	e_input.y = ROWS-1;
 	e_input.h = 1;
 	e_input.oneline = true;
+	e_server.oneline = e_port.oneline =
+		e_nick.oneline = e_passwd.oneline = true;
+	e_server.active = e_port.active = e_nick.active =
+		e_passwd.active = false;
+	e_server.h = e_port.h = e_nick.h = e_passwd.h = 2;
+	e_server.y = 1;
+	e_port.y = 3;
+	e_nick.y = 5;
+	e_passwd.y = 7;
 	view.h = ROWS - 1;
 	pass[0] = 0;
 	sprintf(server, "irc.oftc.net");
@@ -159,9 +172,12 @@ void
 Irc::tail()
 {
 	view.trim_head(view.h*2);
-	view.tail();
-	view.show();
+	if (app() == &e_input) {
+		view.tail();
+		view.show();
+	}
 }
+
 int
 Irc::process()
 {
@@ -181,6 +197,8 @@ Irc::process()
 		} else if (m == KEY_DOWN) {
 			view.down();
 			view.show();
+		} else if (m == KEY_MENU) {
+			select_menu();
 		} else if (m == KEY_ENTER) {
 			strcpy(fmt, e_input.text());
 			e_input.set("");
@@ -188,6 +206,40 @@ Irc::process()
 			irc_input(fmt);
 			sprintf(title, "%s %s", server, channel);
 			tail();
+		} else if (m == APP_EXIT) {
+			if (cli)
+				cli->stop();
+			return m;
+		}
+	} else { // menu
+		if (m == APP_EXIT) {
+			set(&e_input);
+			tail();
+			return 0;
+		}
+		for (int i = 0; i < 4; i++) {
+			if (menus[i] == app()) {
+				if (m == KEY_UP || m == KEY_DOWN) {
+					app()->active = false;
+					app()->show();
+					if (m == KEY_UP) {
+						i = i - 1;
+					} else {
+						i = i + 1;
+					}
+					i = (i<0)?3:i;
+					i = (i>3)?0:i;
+					menus[i]->active = true;
+					set(menus[i]);
+				} else if (m == KEY_ENTER) {
+					strcpy(server, e_server.text());
+					port = atoi(e_port.text());
+					strcpy(nick, e_nick.text());
+					strcpy(pass, e_passwd.text());
+					connect_irc();
+					return 0;
+				}
+			}
 		}
 	}
 	return m;
@@ -197,6 +249,8 @@ bool
 Irc::connect(const char *host, int port)
 {
 	cli = &client;
+	if (port == 6697 || port == 9999)
+		cli = &sslclient;
 	view.show();
 	if (!cli->connect(host, port)) {
 		view.append("Can't connect...");
@@ -206,12 +260,11 @@ Irc::connect(const char *host, int port)
 	return true;
 }
 
-bool
-Irc::select()
+void
+Irc::connect_irc()
 {
-	Serial.println("Select irc");
-	view.show();
 	set(&e_input);
+	view.reset();
 	if (connect(server, port)) {
 		sprintf(title, "%s", server);
 		char fmt[256];
@@ -225,5 +278,28 @@ Irc::select()
 		cli->println(fmt);
 	}
 	view.show();
+}
+
+void
+Irc::select_menu()
+{
+	e_server.set(server);
+	e_server.show();
+	e_port.set(String(port).c_str());
+	e_port.show();
+	e_nick.set(nick);
+	e_nick.show();
+	e_passwd.set(pass);
+	e_passwd.show();
+	e_server.active = true;
+	set(&e_server);
+}
+
+bool
+Irc::select()
+{
+	reset();
+	view.show();
+	select_menu();
 	return true;
 }

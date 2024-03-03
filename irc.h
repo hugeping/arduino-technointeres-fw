@@ -4,6 +4,11 @@
 class Irc : public App {
 	View view;
 	Edit e_input;
+	Edit e_server;
+	Edit e_port;
+	Edit e_nick;
+	Edit e_passwd;
+	App *menus[4] = { &e_server, &e_port, &e_nick, &e_passwd };
 	Client *cli = NULL;
 	WiFiClientSecure &sslclient;
 	WiFiClient &client;
@@ -19,6 +24,8 @@ class Irc : public App {
 	void irc_input(char *cmd);
 	void privmsg(char *channel, char *msg);
 	void tail();
+	void select_menu();
+	void connect_irc();
 public:
 	int process();
 	Irc(Screen &scr, Keyboard &kbd, WiFiClient &c, WiFiClientSecure &sc);
