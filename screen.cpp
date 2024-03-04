@@ -9,6 +9,9 @@ Screen::Screen()
 void
 Screen::setup()
 {
+	pinMode(2, INPUT); /* photo */
+	pinMode(7, OUTPUT); /* brightness */
+	analogWrite(7, 128);
 	memset(screens, 0xff, COLS*ROWS*sizeof(cell_t)*2);
 	tft.init();
 	tft.setRotation(0);

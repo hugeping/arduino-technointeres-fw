@@ -34,7 +34,7 @@ Keyboard::Keyboard()
 {
 	ads = ADS1115_lite(ADS1115_DEFAULT_ADDRESS);  // 0x48 addr pin connected to GND
 	inp_fifo = { 0, 0, { }};
-	layout = 0;
+	layout = 1;
 }
 
 void
