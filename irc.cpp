@@ -153,7 +153,7 @@ Irc::irc_reply(char *cmd)
 	par = skip(cmd, ' ');
 	txt = skip(par, ':');
 	trim(par);
-	if (!strcmp("PING", cmd))
+	if (!strcmp("PONG", cmd))
 		return;
 	if (!strcmp("PRIVMSG", cmd)) {
 		sprintf(fmt, "<%s> %s", usr, txt);
