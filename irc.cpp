@@ -283,7 +283,7 @@ Irc::connect_irc()
 		sprintf(title, "%s", server);
 		char fmt[256];
 		if (pass[0]) {
-			sprintf(fmt, "PASS %s");
+			sprintf(fmt, "PASS %s", pass);
 			cli->println(fmt);
 		}
 		sprintf(fmt, "NICK %s", nick);
