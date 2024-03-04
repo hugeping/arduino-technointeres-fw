@@ -14,7 +14,8 @@ static const struct font8 *font = &FONT;
 
 #define COLS (W/FONT_W)
 #define ROWS (H/FONT_H)
-
+#define FG 0xffff
+#define BG 0
 typedef struct {
 	codepoint_t glyph;
 	color_t bg;

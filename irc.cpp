@@ -9,6 +9,7 @@ Irc::Irc(Screen &scr, Keyboard &kbd, WiFiClient &c, WiFiClientSecure &sc) :
 	e_nick(scr, kbd, "Nick", 64),
 	e_passwd(scr, kbd, "Password", 64)
 {
+	last_usr[0] = 0;
 	e_input.y = ROWS-1;
 	e_input.h = 1;
 	e_input.oneline = true;
@@ -161,7 +162,17 @@ Irc::irc_reply(char *cmd)
 		sprintf(fmt, "PONG ", txt);
 		cli->println(fmt);
 	} else {
-		sprintf(fmt, "%s: >< %s (%s): %s", usr, cmd, par, txt);
+		if (strcmp(usr, last_usr)) {
+			sprintf(fmt, "%s: ", usr);
+			strcpy(last_usr, usr);
+		} else
+			fmt[0] = 0;
+		if (*par)
+			sprintf(fmt + strlen(fmt), "%s(%s): ", cmd, par);
+		else if (*cmd)
+			sprintf(fmt + strlen(fmt), "%s: ", cmd);
+		strcat(fmt, txt);
+//		sprintf(fmt, "%s: >< %s (%s): %s", usr, cmd, par, txt);
 		view.append(fmt);
 		if (!strcmp("NICK", cmd) && !strcmp(usr, nick))
 			strcpy(nick, txt);
@@ -217,25 +228,29 @@ Irc::process()
 			tail();
 			return 0;
 		}
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < menus_nr; i++) {
 			if (menus[i] == app()) {
 				if (m == KEY_UP || m == KEY_DOWN) {
 					app()->active = false;
 					app()->show();
-					if (m == KEY_UP) {
-						i = i - 1;
-					} else {
-						i = i + 1;
-					}
-					i = (i<0)?3:i;
-					i = (i>3)?0:i;
+					i += ((m == KEY_UP)? -1:1);
+					i = (i<0)?menus_nr-1:i;
+					i = (i>=menus_nr)?0:i;
 					menus[i]->active = true;
 					set(menus[i]);
 				} else if (m == KEY_ENTER) {
 					strcpy(server, e_server.text());
 					port = atoi(e_port.text());
+					if (port <= 0)
+						port = 6667;
 					strcpy(nick, e_nick.text());
 					strcpy(pass, e_passwd.text());
+					prefs.begin("IRC", false);
+					prefs.putString("server", e_server.text());
+					prefs.putInt("port", port);
+					prefs.putString("nick", e_nick.text());
+					prefs.putString("passwd", e_passwd.text());
+					prefs.end();
 					connect_irc();
 					return 0;
 				}
@@ -256,7 +271,6 @@ Irc::connect(const char *host, int port)
 		view.append("Can't connect...");
 		return false;
 	}
-	view.append("Connected!");
 	return true;
 }
 
@@ -300,6 +314,20 @@ Irc::select()
 {
 	reset();
 	view.show();
+	prefs.begin("IRC", true);
+	String s = prefs.getString("server");
+	if (s != "")
+		strcpy(server, s.c_str());
+	int p = prefs.getInt("port");
+	if (p > 0)
+		port = p;
+	s = prefs.getString("nick");
+	if (s != "")
+		strcpy(nick, s.c_str());
+	s = prefs.getString("passwd");
+	if (s != "")
+		strcpy(pass, s.c_str());
+	prefs.end();
 	select_menu();
 	return true;
 }

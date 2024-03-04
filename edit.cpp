@@ -194,9 +194,9 @@ Edit::show()
 		int oy = yy + y;
 		bool atcur = (cur == pos) && active;
 		cur_visible |= atcur;
-		scr.clear(ox, oy, 1, 1, (atcur)?fg:bg);
+		scr.clear(ox, oy, 1, 1, (atcur)?FG:BG);
 		if (utf8::fmt_next(buf, &pos, len, w, &xx, &yy))
-			scr.cell(ox, oy, cp, (atcur)?bg:fg);
+			scr.cell(ox, oy, cp, (atcur)?BG:FG);
 	}
 	scr.update();
 }

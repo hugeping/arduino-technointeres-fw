@@ -2,21 +2,24 @@
 #define __IRC_H_INCLUDED
 
 class Irc : public App {
+	static const int menus_nr = 4;
 	View view;
 	Edit e_input;
 	Edit e_server;
 	Edit e_port;
 	Edit e_nick;
 	Edit e_passwd;
-	App *menus[4] = { &e_server, &e_port, &e_nick, &e_passwd };
+	Preferences prefs;
+	App *menus[menus_nr] = { &e_server, &e_port, &e_nick, &e_passwd };
 	Client *cli = NULL;
 	WiFiClientSecure &sslclient;
 	WiFiClient &client;
 	char server[128];
-	int port = 6667;
+	int port = 6697;
 	char pass[64];
 	char nick[64];
 	char host[64];
+	char last_usr[64];
 	char channel[64];
 	char title[64];
 	bool connect(const char *host, int port);
