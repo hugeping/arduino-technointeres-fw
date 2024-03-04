@@ -182,7 +182,7 @@ Irc::irc_reply(char *cmd)
 void
 Irc::tail()
 {
-	view.trim_head(view.h*20);
+	view.trim_head(view.h*30);
 	if (app() == &e_input) {
 		view.tail();
 		view.show();
@@ -194,11 +194,13 @@ Irc::process()
 {
 	char fmt[1024];
 	bool dirty = false;
+	bool dotail = view.visible;
 	if (cli && cli->available()) {
 		String line = cli->readStringUntil('\n');
 		strcpy(fmt, line.c_str());
 		irc_reply(fmt);
-		tail();
+		if (dotail)
+			tail();
 	}
 	int m = app()->process();
 	if (app() == &e_input) {
@@ -220,6 +222,7 @@ Irc::process()
 		} else if (m == APP_EXIT) {
 			if (cli)
 				cli->stop();
+			cli = NULL;
 			return m;
 		}
 	} else { // menu
@@ -277,6 +280,9 @@ Irc::connect(const char *host, int port)
 void
 Irc::connect_irc()
 {
+	if (cli)
+		cli->stop();
+	cli = NULL;
 	set(&e_input);
 	view.reset();
 	if (connect(server, port)) {

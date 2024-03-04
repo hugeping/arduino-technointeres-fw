@@ -18,8 +18,9 @@ class View : public App {
 	int lines_nr = 0;
 	Screen &scr;
 	Keyboard &kbd;
-	boolean visible = false;
 public:
+	boolean visible = false;
+
 	const char *title;
 
 	int x = 0;
