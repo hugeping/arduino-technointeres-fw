@@ -2,7 +2,7 @@
 #define __SCREEN_H_INCLUDED
 #include <TFT_eSPI.h>
 #include <SPI.h>
-#include "font8x12.h"
+#include "font8x16.h"
 #include "utf8.h"
 
 #define W 240

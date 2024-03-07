@@ -66,7 +66,7 @@ struct font8 {
 	const int h;
 };
 #define FONT_W 8
-#define FONT_H 12
+#define FONT_H 16
 const struct font8 FONT = {
 	.data = FONT_data,
 	.map = FONT_map,
