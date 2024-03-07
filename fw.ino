@@ -7,7 +7,7 @@ WiFiClient client;
 Screen scr = Screen();
 Keyboard kbd = Keyboard();
 
-Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Edit", "Gemini", "IRC", "Sensor", NULL });
+Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Edit", "Gemini", "IRC", "Sensor", "Settings", NULL });
 App app(&main_menu);
 
 Edit edit_box(scr, kbd, "Edit", 4096);
@@ -15,6 +15,9 @@ Wifilist wifi(scr, kbd);
 Gemini gemini(scr, kbd, sslClient);
 Sensor sensor(scr, kbd);
 Irc irc(scr, kbd, client, sslClient);
+Settings settings(scr, kbd);
+
+static App *menu_apps[] = { &wifi, &edit_box, &gemini, &irc, &sensor, &settings };
 
 void
 setup()
@@ -25,6 +28,7 @@ setup()
 	kbd.setup();
 	sensor.setup();
 	wifi.setup();
+	settings.setup();
 	app.show();
 }
 
@@ -39,25 +43,7 @@ void loop()
 	int m = app.process();
 	if (app.app() == &main_menu && m >= 0) {
 		Serial.println(String(m));
-		switch (m) {
-		case 0:
-			app.push(&wifi);
-			break;
-		case 1:
-			app.push(&edit_box);
-			break;
-		case 2:
-			app.push(&gemini);
-			break;
-		case 3:
-			app.push(&irc);
-			break;
-		case 4:
-			app.push(&sensor);
-			break;
-		default:
-			break;
-		}
+		app.push(menu_apps[m]);
 	} else if (m == APP_EXIT) {
 		app.pop();
 	}

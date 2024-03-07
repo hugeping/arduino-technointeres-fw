@@ -1,6 +1,3 @@
-#ifndef __GEMINI_H_INCLUDED
-#define __GEMINI_H_INCLUDED
-
 #define MAX_LINKS 128
 class Gemini : public App {
 	View view;
@@ -33,4 +30,3 @@ public:
 	~Gemini() { free(server); free(last_url); };
 	bool select();
 };
-#endif

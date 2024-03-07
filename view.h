@@ -1,7 +1,3 @@
-#ifndef __VIEW_H_INCLUDED
-#define __VIEW_H_INCLUDED
-
-
 class View : public App {
 	struct line_t;
 
@@ -41,4 +37,3 @@ public:
 	int process();
 	void show();
 };
-#endif

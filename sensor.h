@@ -1,6 +1,3 @@
-#ifndef __SENSOR_H_INCLUDED
-#define __SENSOR_H_INCLUDED
-
 class Sensor : public App {
 	SHT3x sensor;
 	Screen &scr;
@@ -13,4 +10,3 @@ public:
 	int process();
 	void show();
 };
-#endif

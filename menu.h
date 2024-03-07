@@ -1,6 +1,3 @@
-#ifndef __MENU_H_INCLUDED
-#define __MENU_H_INCLUDED
-
 class Menu : public App {
 	const char *title;
 	String *list;
@@ -27,4 +24,3 @@ public:
 	int process();
 	void show();
 };
-#endif

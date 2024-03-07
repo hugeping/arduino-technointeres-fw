@@ -1,6 +1,3 @@
-#ifndef __IRC_H_INCLUDED
-#define __IRC_H_INCLUDED
-
 class Irc : public App {
 	static const int menus_nr = 4;
 	View view;
@@ -35,4 +32,3 @@ public:
 	~Irc() { };
 	bool select();
 };
-#endif

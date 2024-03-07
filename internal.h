@@ -6,6 +6,7 @@
 #include "edit.h"
 #include "view.h"
 #include "sensor.h"
+#include "settings.h"
 #include "wifilist.h"
 #include "gemini.h"
 #include "irc.h"

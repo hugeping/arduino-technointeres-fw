@@ -1,6 +1,3 @@
-#ifndef __EDIT_H_INCLUDED
-#define __EDIT_H_INCLUDED
-
 class Edit : public App {
 	codepoint_t *buf;
 	Screen &scr;
@@ -30,4 +27,3 @@ public:
 	void show();
 	void geom(int x, int y, int w, int h);
 };
-#endif
