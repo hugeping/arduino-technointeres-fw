@@ -1,6 +1,8 @@
 #include "external.h"
 #include "internal.h"
 
+#define WRAP_BY_WORDS
+
 View::View(Screen &screen, Keyboard &keys, const char *t) : scr(screen), kbd(keys), title(t)
 {
 }
@@ -101,6 +103,47 @@ View::reset()
 	lines_nr = 0;
 }
 
+bool
+View::fmt_next(codepoint_t *buf, int last, int *off, int len, int *xx, int *yy)
+{
+	codepoint_t cp = buf[*off];
+	if (cp == '\n') {
+		(*yy) ++;
+		*xx = 0;
+		(*off) ++;
+		return false;
+	}
+#ifdef WRAP_BY_WORDS
+	int start = utf8::start_line(buf + last, *off - last) + last;
+	bool words = false;
+
+	for (int i = start; i < *off; i ++) {
+		if (utf8::is_space(buf[i])) {
+			words = true;
+			break;
+		}
+	}
+
+	for (int i = 0; words && *off + i < len; i ++) {
+		if (*xx + i >= w) {
+			*xx = 0;
+			(*yy) ++;
+			return false;
+		}
+		cp = buf[*off + i];
+		if (utf8::is_space(cp) || cp == '\n')
+			break;
+	}
+#endif
+	(*xx) ++;
+	(*off) ++;
+	if (*xx >= w) {
+		*xx = 0;
+		(*yy) ++;
+	}
+	return true;
+}
+
 void
 View::append(const char *text)
 {
@@ -140,11 +183,11 @@ View::append(const char *text)
 	while (i < sz) {
 		int ox = xx;
 		int oy = yy;
-		utf8::fmt_next(buf, &i, sz, w, &xx, &yy);
+		fmt_next(buf, last_i, &i, sz, &xx, &yy);
 		if (yy > oy || i == sz) {
 			ln->len = i - last_i;
-			last_i = i;
 			ln->next = NULL;
+			last_i = i;
 			if (i < sz) {
 				struct line_t *nl = (struct line_t*)malloc(sizeof(struct line_t));
 				if (!nl)

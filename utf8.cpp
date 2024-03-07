@@ -1,4 +1,9 @@
 #include "utf8.h"
+bool
+utf8::is_space(codepoint_t cp)
+{
+	return cp == ' ' || cp == '\t';
+}
 int
 utf8::start_line(codepoint_t *buf, int off)
 {
@@ -59,7 +64,7 @@ utf8::fmt_next(codepoint_t *buf, int *off, int len, int w, int *x, int *y)
 		//(*off) --;
 		*x = 0;
 		(*y) ++;
-		return false;
+		return true;
 	}
 	return true;
 }

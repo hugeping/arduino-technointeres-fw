@@ -15,6 +15,7 @@ public:
 	static bool fmt_next(codepoint_t *buf, int *off, int len, int w, int *x, int *y);
 	static int fmt_up(codepoint_t *buf, int off, int w);
 	static int fmt_down(codepoint_t *buf, int off, int len, int w);
+	static bool is_space(codepoint_t cp);
 };
 
 #endif

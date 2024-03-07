@@ -14,6 +14,7 @@ class View : public App {
 	int lines_nr = 0;
 	Screen &scr;
 	Keyboard &kbd;
+	bool fmt_next(codepoint_t *buf, int last, int *off, int len, int *xx, int *yy);
 public:
 	boolean visible = false;
 
