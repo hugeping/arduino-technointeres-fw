@@ -248,6 +248,7 @@ Art::process()
 			return APP_EXIT;
 		} else if (c == KEY_ENTER || c == KEY_MENU) {
 			scr.clear(0, ROWS-3, COLS, 3);
+			m_page.set(String(start+1).c_str());
 			set(&m_page);
 			return 0;
 		}

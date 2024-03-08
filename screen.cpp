@@ -177,14 +177,15 @@ Screen::text(int x, int y, const char *str, color_t fg, bool brk)
 			c += COLS;
 			x = ox;
 		} else {
-			if (x < COLS) {
-				c[x].glyph = cp;
-				c[x].fg = fg;
-				x ++;
-			} else if (brk) {
+			if (brk && x >= COLS) {
 				x = ox;
 				y ++;
 				c += COLS;
+			}
+			if (x < COLS && y < ROWS) {
+				c[x].glyph = cp;
+				c[x].fg = fg;
+				x ++;
 			}
 		}
 	} while(*ptr && y < ROWS);
