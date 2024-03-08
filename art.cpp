@@ -53,7 +53,7 @@ Art::display_block(int nr, uint8_t *buf)
 				if (xx == 0 || xx == 31)
 					continue;
 				uint8_t a = pa[xx];
-				int br = (b&0x40)?8:0;
+				int br = (a&0x40)?8:0;
 				uint8_t *fc = pal[(a & 0x7) + br];
 				uint8_t *bc = pal[((a>>3) & 0x7) + br];
 				color_t fg = scr.color(fc[0], fc[1], fc[2]);
@@ -75,11 +75,11 @@ void
 Art::display(const char *title, uint8_t *buf)
 {
 	char fmt[256];
-	sprintf(fmt, "[%d] %s", start, title);
+	sprintf(fmt, "%d/%d\n%s", start + 1, total, title);
 	scr.clear();
 	if (!buf)
 		scr.text(0, 0, "Unsupported format");
-	scr.text(0, ROWS-1, fmt);
+	scr.text(0, ROWS-2, fmt);
 	scr.update(true);
 	if (!buf)
 		return;
@@ -99,7 +99,7 @@ Art::request()
 		return false;
 	}
 	// ,desc
-	sprintf(fmt, "GET /api/types:zxPicture/export:zxPicture/start:%d/limit:1/order:date HTTP/1.1",
+	sprintf(fmt, "GET /api/types:zxPicture/export:zxPicture/start:%d/limit:1/order:date,asc/filter:zxPictureType=standard; HTTP/1.1",
 		start);
 	http_request(fmt);
 
@@ -111,6 +111,7 @@ Art::request()
 		client.stop();
 		return false;
 	}
+	total = json["totalAmount"];
 	String url = json["responseData"]["zxPicture"][0]["originalUrl"];
 	String title = json["responseData"]["zxPicture"][0]["title"];
 	if (!url.startsWith("https://zxart.ee")) {
@@ -147,6 +148,7 @@ Art::process()
 		} else if (c == KEY_LEFT || c == KEY_UP) {
 			start -= (c == KEY_UP)?10:1;
 		}
+		start = min(start, total-1);
 		start = max(0, start);
 		request();
 	}

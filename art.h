@@ -4,6 +4,7 @@ class Art : public App {
 	Keyboard &kbd;
 	WiFiClientSecure &client;
 	int start = 0;
+	int total = 0;
 	void http_request(const char *req);
 	bool request();
 	void display_block(int nr, uint8_t *buf);
