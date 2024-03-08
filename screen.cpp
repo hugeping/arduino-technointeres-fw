@@ -164,7 +164,7 @@ Screen::text_scroll(const char *str, int w, long *otick)
 }
 
 void
-Screen::text(int x, int y, const char *str, color_t fg)
+Screen::text(int x, int y, const char *str, color_t fg, bool brk)
 {
 	const char *ptr = str;
 	codepoint_t cp = 0;
@@ -173,15 +173,19 @@ Screen::text(int x, int y, const char *str, color_t fg)
 	do {
 		ptr = utf8::to_codepoint(ptr, &cp);
 		if (cp == '\n') {
-			y = y + 1;
+			y ++;
 			c += COLS;
 			x = ox;
 		} else {
 			if (x < COLS) {
 				c[x].glyph = cp;
 				c[x].fg = fg;
+				x ++;
+			} else if (brk) {
+				x = ox;
+				y ++;
+				c += COLS;
 			}
-			x ++;
 		}
 	} while(*ptr && y < ROWS);
 }

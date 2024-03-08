@@ -47,6 +47,8 @@ public:
 		return a;
 	};
 	App *app() {
+		if (app_nr == 0)
+			return NULL;
 		return apps[app_nr -1];
 	};
 };

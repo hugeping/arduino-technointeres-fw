@@ -30,6 +30,7 @@ setup()
 	kbd.setup();
 	sensor.setup();
 	wifi.setup();
+	art.setup();
 	settings.setup();
 	app.show();
 }

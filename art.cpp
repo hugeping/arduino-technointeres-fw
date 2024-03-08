@@ -2,8 +2,19 @@
 #include "internal.h"
 
 Art::Art(Screen &screen, Keyboard &keys, WiFiClientSecure &c):
-	scr(screen), kbd(keys), client(c)
+	scr(screen), kbd(keys), client(c), m_page(screen, keys, "Page", 16)
 {
+	m_page.oneline = true;
+	m_page.y = ROWS - 3;
+}
+
+void
+Art::setup()
+{
+	prefs.begin("art", true);
+	start = prefs.getInt("page", 0);
+	Serial.println("Get start:" + String(start));
+	prefs.end();
 }
 
 void
@@ -79,13 +90,43 @@ Art::display(const char *title, uint8_t *buf)
 	scr.clear();
 	if (!buf)
 		scr.text(0, 0, "Unsupported format");
-	scr.text(0, ROWS-2, fmt);
+	scr.text(0, ROWS-3, fmt, 0x0000ff, true);
 	scr.update(true);
 	if (!buf)
 		return;
 	scr.tft.setWindow(0, 0, 239, 191);
 	for (int nr = 0; nr < 3; nr ++)
 		display_block(nr, buf);
+	prefs.begin("art", false);
+	prefs.putInt("page", start);
+	prefs.end();
+}
+
+static void
+decode(char *str)
+{
+	char c;
+	char *dst = str;
+	while ((c = *str++)) {
+		if (c == '&') {
+			if (str[0] == '#') {
+				int pos = strcspn(str, ";");
+				if (str[pos]) {
+					str[pos] = 0;
+					*dst ++ = atoi(str + 1);
+					str += pos;
+					continue;
+				}
+			} else if (!strncmp(str, "amp;", 4)) {
+				*dst ++ = '&';
+				str += 4;
+				continue;
+			}
+		}
+		*dst ++ = c;
+		continue;
+	}
+	*dst = 0;
 }
 
 bool
@@ -112,36 +153,57 @@ Art::request()
 		return false;
 	}
 	total = json["totalAmount"];
-	String url = json["responseData"]["zxPicture"][0]["originalUrl"];
-	String title = json["responseData"]["zxPicture"][0]["title"];
-	if (!url.startsWith("https://zxart.ee")) {
+	char url[256];
+	strcpy(url, json["responseData"]["zxPicture"][0]["originalUrl"]);
+	decode(url);
+	char title[256];
+	strcpy(title, json["responseData"]["zxPicture"][0]["title"]);
+	decode(title);
+	if (strncmp(url, "https://zxart.ee", 16)) {
 		client.stop();
 		return false;
 	}
 	int i = 0;
-	if (url.endsWith(".scr")) {
-		sprintf(fmt, "GET %s HTTP/1.1", url.c_str()+16);
-		Serial.println(fmt);
-		http_request(fmt);
-		while ((client.connected() || client.available()) && i < 6912) {
-			screen[i++] = client.read();
-		}
-		Serial.println();
-		Serial.println("Bytes readed: " + String(i));
-	}
+
+	sprintf(fmt, "GET %s HTTP/1.1", url+16);
+	Serial.println(fmt);
+	http_request(fmt);
+	while ((client.connected() || client.available()) && i < 6912)
+		screen[i++] = client.read();
+//	Serial.println("Bytes readed: " + String(i));
+
 	client.stop();
-	display(title.c_str(), (i == 6912)?screen:NULL);
+	display(title, (i == 6912)?screen:NULL);
 	return true;
 }
 int
 Art::process()
 {
 	uint8_t c;
+	if (app() == &m_page) {
+		int m = m_page.process();
+		if (m == KEY_ENTER) {
+			start = atoi(m_page.text())-1;
+			start = min(total - 1, start);
+			start = max(0, start);
+			reset();
+			request();
+		} else if (m == APP_EXIT) {
+			reset();
+			scr.clear(0, ROWS-3, COLS, 3);
+			scr.update();
+		}
+		return 0;
+	}
 	while ((c = kbd.input())) {
 		if (c == KEY_ESC) {
 			scr.tft.fillRect(0, 0, W, H, 0);
 			scr.update(true);
 			return APP_EXIT;
+		} else if (c == KEY_ENTER || c == KEY_MENU) {
+			scr.clear(0, ROWS-3, COLS, 3);
+			set(&m_page);
+			return 0;
 		}
 		if (c == KEY_RIGHT || c == KEY_DOWN) {
 			start += (c == KEY_DOWN)?10:1;

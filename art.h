@@ -2,6 +2,7 @@ class Art : public App {
 	Preferences prefs;
 	Screen &scr;
 	Keyboard &kbd;
+	Edit m_page;
 	WiFiClientSecure &client;
 	int start = 0;
 	int total = 0;
@@ -11,6 +12,7 @@ class Art : public App {
 	void display(const char *title, uint8_t *buf);
 public:
 	int process();
+	void setup();
 	Art(Screen &scr, Keyboard &kbd, WiFiClientSecure &c);
 	bool select();
 };
