@@ -117,23 +117,19 @@ Art::request()
 		client.stop();
 		return false;
 	}
-	sprintf(fmt, "GET %s HTTP/1.1", url.c_str()+16);
-	Serial.println(fmt);
-	http_request(fmt);
 	int i = 0;
-
-	while ((client.connected() || client.available()) && i < 6912) {
-		if (client.available())
+	if (url.endsWith(".scr")) {
+		sprintf(fmt, "GET %s HTTP/1.1", url.c_str()+16);
+		Serial.println(fmt);
+		http_request(fmt);
+		while ((client.connected() || client.available()) && i < 6912) {
 			screen[i++] = client.read();
-//			if (i < 32) {
-//				sprintf(fmt, "%02x ", screen[i-1]);
-//				Serial.print(fmt);
-//			}
+		}
+		Serial.println();
+		Serial.println("Bytes readed: " + String(i));
 	}
-	Serial.println();
-	Serial.println("Bytes readed: " + String(i));
 	client.stop();
-	display(title.c_str(), url.endsWith(".scr")?screen:NULL);
+	display(title.c_str(), (i == 6912)?screen:NULL);
 	return true;
 }
 int
