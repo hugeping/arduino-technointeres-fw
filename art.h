@@ -10,6 +10,7 @@ class Art : public App {
 	bool request();
 	void display_block(int nr, uint8_t *buf);
 	void display(const char *title, uint8_t *buf);
+	void message(const char *msg);
 public:
 	int process();
 	void setup();

@@ -83,6 +83,14 @@ Art::display_block(int nr, uint8_t *buf)
 }
 
 void
+Art::message(const char *msg)
+{
+	scr.clear();
+	scr.text(0, 0, msg, FG, true);
+	scr.update(true);
+}
+
+void
 Art::display(const char *title, uint8_t *buf)
 {
 	char fmt[256];
@@ -156,7 +164,7 @@ Art::request()
 	sprintf(fmt, "GET /api/types:zxPicture/export:zxPicture/start:%d/limit:1/order:date,asc/filter:zxPictureType=standard; HTTP/1.1",
 		start);
 	http_request(fmt);
-
+	Serial.println("Req done");
 	StaticJsonDocument<512> json;
 	DeserializationError error = deserializeJson(json, client);
 	if (error) {
@@ -166,18 +174,22 @@ Art::request()
 		return false;
 	}
 	total = json["totalAmount"];
+	Serial.println("Total:"+String(total));
 	char url[256];
-	strcpy(url, json["responseData"]["zxPicture"][0]["originalUrl"]);
+	const char *v = json["responseData"]["zxPicture"][0]["originalUrl"];
+	strcpy(url, v?v:"");
 	decode(url);
 	if (strncmp(url, "https://zxart.ee", 16)) {
 		client.stop();
-		return false;
+		display("", NULL);
+		return true;
 	}
 	url_encode(fmt, url);
 	strcpy(url, fmt);
 
 	char title[256];
-	strcpy(title, json["responseData"]["zxPicture"][0]["title"]);
+	v = json["responseData"]["zxPicture"][0]["title"];
+	strcpy(title, v?v:"");
 	decode(title);
 	int i = 0;
 
@@ -236,7 +248,9 @@ Art::process()
 bool
 Art::select()
 {
-	if (!request())
-		return false;
+	if (!request()) {
+		reset();
+		message("Connection error");
+	}
 	return true;
 }
