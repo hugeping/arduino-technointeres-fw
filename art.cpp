@@ -97,7 +97,7 @@ Art::display(const char *title, uint8_t *buf)
 	sprintf(fmt, "%d/%d\n%s", start + 1, total, title);
 	scr.clear();
 	if (!buf)
-		scr.text(0, 0, "Unsupported format");
+		scr.text(0, 0, "Wrong data", FG, true);
 	scr.text(0, ROWS-3, fmt, 0x0000ff, true);
 	scr.update(true);
 	if (!buf)
@@ -197,6 +197,7 @@ Art::request()
 	const char *v = json["responseData"]["zxPicture"][0]["originalUrl"];
 	strcpy(url, v?v:"");
 	decode(url);
+//	Serial.println(url);
 	if (strncmp(url, "https://zxart.ee", 16)) {
 		client.stop();
 		display("", NULL);
