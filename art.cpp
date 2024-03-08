@@ -159,7 +159,7 @@ static void
 url_encode(char *dst, const char *src)
 {
 	while (*src) {
-		if (*src == '#') {
+		if (*src == '#' || *src == ':') {
 			sprintf(dst, "%%%02x", *src);
 			dst += 3;
 			src ++;
