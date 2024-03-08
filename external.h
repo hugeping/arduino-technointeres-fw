@@ -4,3 +4,4 @@
 #include <Preferences.h>
 #include <SHT3x.h>
 #include <string.h>
+#include <ArduinoJson.h>

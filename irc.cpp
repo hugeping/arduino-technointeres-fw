@@ -58,19 +58,19 @@ eat(char *s, int (*p)(int), int r)
 }
 
 void
-Irc::privmsg(char *channel, char *msg)
+Irc::privmsg(char *chan, char *msg)
 {
         char fmt[256];
-        if(channel[0] == '\0') {
+        if(chan[0] == '\0') {
                 view.append("No channel to send to");
                 return;
         }
-        if (!strcmp(channel, this->channel))
+        if (!strcmp(chan, channel))
         	sprintf(fmt, "<%s> %s", nick, msg);
         else
-        	sprintf(fmt, "%s: <%s> %s", channel, nick, msg);
+		sprintf(fmt, "%s: <%s> %s", chan, nick, msg);
         view.append(fmt);
-        sprintf(fmt, "PRIVMSG %s :%s", channel, msg);
+        sprintf(fmt, "PRIVMSG %s :%s", chan, msg);
         cli->println(fmt);
 }
 
@@ -183,6 +183,8 @@ void
 Irc::tail()
 {
 	view.trim_head(view.h*30);
+	if (!view.visible)
+		return;
 	if (app() == &e_input) {
 		view.tail();
 		view.show();
@@ -193,15 +195,16 @@ int
 Irc::process()
 {
 	char fmt[1024];
-	bool dirty = false;
-	bool dotail = view.visible;
-	if (cli && cli->available()) {
+	int rate = 0;
+	while (cli && cli->available()) {
 		String line = cli->readStringUntil('\n');
 		strcpy(fmt, line.c_str());
 		irc_reply(fmt);
-		if (dotail)
+		view.trim_head(view.h*30);
+		if (rate++ % view.h == 0)
 			tail();
 	}
+	tail();
 	int m = app()->process();
 	if (app() == &e_input) {
 		if (m == KEY_UP) {
@@ -227,6 +230,8 @@ Irc::process()
 		}
 	} else { // menu
 		if (m == APP_EXIT) {
+			if (!cli)
+				return m;
 			set(&e_input);
 			tail();
 			return 0;
@@ -319,6 +324,7 @@ bool
 Irc::select()
 {
 	reset();
+	view.reset();
 	view.show();
 	prefs.begin("IRC", true);
 	String s = prefs.getString("server");

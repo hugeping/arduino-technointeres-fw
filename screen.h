@@ -39,7 +39,7 @@ public:
 	void cell(int x, int y, codepoint_t cp, color_t fg = 0xffff);
 	void clear(int xx = 0, int yy = 0, int w = COLS, int h = ROWS, color_t col = 0x0);
 	void text(int x, int y, const char *str, color_t fg = 0xffff);
-	void update();
+	void update(bool force = false);
 	color_t color(byte r, byte g, byte b);
 	bool text_scroll(const char *str, int w, long *otick);
 	void text_scrolled(int x, int y, const char *text, int w, int offset);

@@ -10,3 +10,4 @@
 #include "wifilist.h"
 #include "gemini.h"
 #include "irc.h"
+#include "art.h"

@@ -113,13 +113,13 @@ Screen::clear(int xx, int yy, int w, int h, color_t col)
 }
 
 void
-Screen::update()
+Screen::update(bool force)
 {
 	cell_t *line = get_screen();
 	cell_t *oline = get_old_screen();
 	for (int y = 0; y < ROWS; y ++) {
 		for (int x = 0; x < COLS; x ++) {
-			if (line[x].glyph != oline[x].glyph ||
+			if (force || line[x].glyph != oline[x].glyph ||
 				line[x].fg != oline[x].fg ||
 				line[x].bg != oline[x].bg) {
 					update_cell(x, y, &line[x]);

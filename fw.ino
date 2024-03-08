@@ -7,17 +7,19 @@ WiFiClient client;
 Screen scr = Screen();
 Keyboard kbd = Keyboard();
 
-Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Edit", "Gemini", "IRC", "Sensor", "Settings", NULL });
+Menu main_menu(scr, kbd, "Main", (const char *[]){ "WiFi", "Edit", "Gemini", "IRC",
+	"Sensor", "Art", "Settings", NULL });
 App app(&main_menu);
 
 Edit edit_box(scr, kbd, "Edit", 4096);
 Wifilist wifi(scr, kbd);
 Gemini gemini(scr, kbd, sslClient);
+Art art(scr, kbd, sslClient);
 Sensor sensor(scr, kbd);
 Irc irc(scr, kbd, client, sslClient);
 Settings settings(scr, kbd);
 
-static App *menu_apps[] = { &wifi, &edit_box, &gemini, &irc, &sensor, &settings };
+static App *menu_apps[] = { &wifi, &edit_box, &gemini, &irc, &sensor, &art, &settings };
 
 void
 setup()
