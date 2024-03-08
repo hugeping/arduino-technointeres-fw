@@ -20,6 +20,7 @@ is_esc(char c)
 	case '\t':
 	case '%':
 	case '/':
+	case '#':
 	case '-':
 	case '.':
 	case '?':

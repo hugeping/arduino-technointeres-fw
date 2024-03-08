@@ -129,6 +129,19 @@ decode(char *str)
 	*dst = 0;
 }
 
+static void
+url_encode(char *dst, const char *src)
+{
+	while (*src) {
+		if (*src == '#') {
+			sprintf(dst, "%%%02x", *src);
+			dst += 3;
+			src ++;
+		} else
+			*dst ++ = *src ++;
+	}
+	*dst = *src;
+}
 bool
 Art::request()
 {
@@ -156,13 +169,16 @@ Art::request()
 	char url[256];
 	strcpy(url, json["responseData"]["zxPicture"][0]["originalUrl"]);
 	decode(url);
-	char title[256];
-	strcpy(title, json["responseData"]["zxPicture"][0]["title"]);
-	decode(title);
 	if (strncmp(url, "https://zxart.ee", 16)) {
 		client.stop();
 		return false;
 	}
+	url_encode(fmt, url);
+	strcpy(url, fmt);
+
+	char title[256];
+	strcpy(title, json["responseData"]["zxPicture"][0]["title"]);
+	decode(title);
 	int i = 0;
 
 	sprintf(fmt, "GET %s HTTP/1.1", url+16);
@@ -220,6 +236,7 @@ Art::process()
 bool
 Art::select()
 {
-	request();
+	if (!request())
+		return false;
 	return true;
 }
