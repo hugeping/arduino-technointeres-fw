@@ -109,6 +109,16 @@ Art::display(const char *title, uint8_t *buf)
 	prefs.putInt("page", start);
 	prefs.end();
 }
+static struct {
+	const char *pfx;
+	const char s;
+} amp_sub[] = {
+	{ "amp;", '&' },
+	{ "quot;", '"' },
+	{ "lt;", '<' },
+	{ "gt;", '>' },
+	{ NULL, 0 },
+};
 
 static void
 decode(char *str)
@@ -125,11 +135,19 @@ decode(char *str)
 					str += pos;
 					continue;
 				}
-			} else if (!strncmp(str, "amp;", 4)) {
-				*dst ++ = '&';
-				str += 4;
-				continue;
 			}
+			bool hit = false;
+			for (int i = 0; amp_sub[i].pfx; i++) {
+				int len = strlen(amp_sub[i].pfx);
+				if (!strncmp(str, amp_sub[i].pfx, len)) {
+					*dst ++ = amp_sub[i].s;
+					str += len;
+					hit = true;
+					break;
+				}
+			}
+			if (hit)
+				continue;
 		}
 		*dst ++ = c;
 		continue;
