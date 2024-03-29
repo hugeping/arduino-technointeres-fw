@@ -159,7 +159,7 @@ Irc::irc_reply(char *cmd)
 		sprintf(fmt, "<%s> %s", usr, txt);
 		view.append(fmt);
 	} else if (!strcmp("PING", cmd)) {
-		sprintf(fmt, "PONG ", txt);
+		sprintf(fmt, "PONG %s", txt);
 		cli->println(fmt);
 	} else {
 		if (strcmp(usr, last_usr)) {
